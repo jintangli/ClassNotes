@@ -1,0 +1,1437 @@
+start angular server in cmd:
+	$ng serve
+
+angular server runs in:
+	localhost:4200
+	
+add bootstrap to project:
+	use cmd, in project home directory:
+		$npm install --save bootstrap@3
+	add a line to the styles list in angular.json:
+		"node_modules/bootstrap/dist/css/bootstrap.min.css"
+	restart angular server
+	
+	verify bootstrap is added:
+		chrome->development tools->elements->head:
+			bootstrap should be imported as one of the style
+			
+***********************************************************************
+basics
+***********************************************************************
+angular is a framework for single page app
+	index.html is the single page
+	root component is created by default
+		root component ties together the whole application
+		
+**scripts are inserted in the end of the index.html
+	These scripts trigger angular
+		execute code in the main.ts file
+		*main.ts bootstraps Angular application
+			AppModule is passed as argument
+		AppModule is defined in app.module.ts
+		app.module.ts contains bootstrap list
+			AppComponent is in the bootstrap list
+		AppComponent is created by default
+			app.component.ts file
+				app-root is define in this file
+					index.html renders the app-root component
+
+components
+	**angular app is composed from components
+		root component hosts the entire app
+		each component has its own 
+			template(html code)
+			style(css code)
+			business logic(js code)
+			
+	add new component
+		new component selectors are added to the app.component.html
+		new component files are added in a new folder under the app folder
+			have the folder name equal to component name
+			component is ts class so angular is able to instantiate
+			"export class{ }" 
+				so this class is able to be used outside of this file
+			"@Component({selector: 'app-server', templateUrl:'./server.component.html'})" 
+				ts class decorator telling angular that this class is a component
+				{} contains meta data telling angular what to do with this ts class
+			"import {Component} from '@angular/core';"
+				need to import component feature form angular
+		generating component from cli
+			generated under app directory
+				$ng g c recipes --spec false
+			generated under directory under app	
+				$ng g c recipes/recipes-list --spec false
+			
+			
+		
+		
+		
+		
+	add new component from cli
+		$ng generate component <component-name>
+			generates css, html, ts files in servers folder
+			also add the new component into AppModule
+		
+	
+modules			
+	app module
+		module bundles components into packages telling angular what features an app has
+			app.module.ts
+				it is a ts class decorated with "@NgModule({declarations:[], imports:[], providers:[], bootstrap:[]})"
+			**angular does NOT scan all the files, new components need to be registered to angular
+				**add it to the declarations list "declarations:[ServerComponent]"
+				import component into app.module.ts "import {ServerComponent} from './server/server.component'; "
+				
+selector
+	follows the css selectors
+		selector as attribute
+			"@Component({selector:'[app-servers]'})"
+		selector as class
+			"@Component({selector:'.app-servers'})"
+		selector as element, *the prefer way
+			"@Component({selector:'app-servers'})"
+			
+databinding
+	databinding = communication
+	communication between 
+		TypeScript Code(Business Logic)|-----------------output data--------------->|Template(HTML)
+									   |		string interpolation({{data}})      |
+									   | 		property binding([property]="data") |
+									   |<-------------react to user events----------|
+									   |		event Binding((event)="expression") |
+	                                   |        two-way-binding([(ngModel)]="data") |                                         |
+		
+	string interpolation
+		for outputting data in template
+		**{{x}} x = any expression that eventually evaluate to a string
+			can be simply hardcode string
+				{{'server'}}
+			normally variable defined in the ts file
+				{{severId}}
+			can be method that returns string
+				{{getServerStatus()}}
+			no block expression, something like if statements
+			no multiline expression
+			
+	property binding
+		bind to html element properties
+			**[property-name]="ts-variable"
+				"<button [disabled]="!allowNewServer">"
+					[] directly bind the disabled property to allowNewServer
+					**dynamically manage the property by updating the dom object
+		allow updating properties value dynamically from ts file
+			"allowNewServer = false;"
+		
+	Event binding
+		**(event-name)="funtion-name()"
+			bind event to funtion defined in ts file
+				when the event happens, call the funtion
+		
+		$event is reserved keyword for template
+			(event-name)="funtion-name($event)"
+				$event contains the data emitted by the event-name
+				
+	two-way-binding
+		combining property and event binding
+		need to use directive ngModel
+			**<input type="text" [(ngModel)]="serverName">
+				triggered on the input event
+				automatically update the value of serverName in our component
+				also update the value of input field if serverName changed somewhere else
+		
+		
+Directives
+	
+	**directives are instructions in the DOM
+		components are directives with a template
+			placing the component selector in the template instructs angular to
+				add the content of template and
+				add business logic of ts file in the place where selector is used
+		directives could have no template
+		directives are added as attribute seletor
+		
+	build-in directives
+		structure directives
+			**changing the structure of DOM
+				either add this element to the DOM
+				or does not add this element to the DOM
+			structure directives has *
+			*ngIf
+				*ngIf="expression returning true/false"
+				can contain else statement
+					" <p *ngIf="serverCreated; else noServer"> "
+					
+			*ngFor
+				<app-server *ngFor="let server of servers" ></app-server>
+				let defines temporary variable inside the loop
+				server can be passed as argument to app-server component
+					
+		attribute directives
+			does NOT add or remove elements only change the element they were placed on
+			[ngStyle]="{backgroundColor: getColor()}"
+				directive name is ngStyle
+				add [] to use property binding
+				property name is also ngStyle
+					**property binding is not the same as directive
+				dynamically assigns a css style
+				
+			[ngClass]="{css-class-name: condiction controlling if css-class should be apply or not}"
+				dynamically add or assign css class
+					[ngClass]="{online: getServerStatus() === 'online'}"
+				
+Model
+    model is a typescript class acting as blueprint for objects we create
+	
+
+Component communication
+	
+	**passing data between components
+		from parent component to child component, sending data to component
+			use property binding on component
+			
+		from child component to parent component, receiving data/event from component
+			use event binding on component
+			
+	Property binding on component
+		**by default, all properties of component are only accessible inside component
+		
+		exposing component property of child component to other component
+			use @Input() decorator on property
+				@input() element: {type: string, name: string, content: string};
+				import{Input} from '@angular/core';
+			alias to property name
+				@input("svrElement") element: {type: string, name: string, content: string};
+					use svrElement in template for element property
+	event binding on component
+		create property as EventEmitter in *child component
+			@Output() serverAdded = new EventEmitter<{newServerName: string, newServerContent: string}>();
+			
+		exposing this property using @Output
+			import{Input} from '@angular/core';
+		
+		calling emit() to send data to parent component
+			this.serverAdded.emit({newServerName: this.newServerName, newServerContent: this.newServerContent});
+			
+		parent component binds this event to its own method
+			<app-cockpit (serverAdded)="onServerAdded($event)"> </app-cockpit>
+			
+		
+view encapsulation
+	
+	style defined in component css file only applies to that component template file
+		Angular adds an unique attribute to all css style definition and html element
+			p[_ngcontent-ejo-2]{color: blue;}
+			<p _ngcontent-ejo-2> some text </p>
+			
+	override angular style encapsulation
+		in ts file @Component decorator
+			@Component({encapsulation: ViewEncapsulation.None})
+			import{ViewEncapsulation} from '@angular/core';
+			
+using local reference in templates
+	
+	local reference can be placed on any html element
+		<input type="text" #serverNameInput>
+		
+	it holds reference to the element NOT value entered there
+		<button (click)="onAddServer(serverNameInput)"> Add Server </button>
+		onAddServer(serverNameInput: HTMLInputElement){ this.serverCreated.emit({serverName: serverNameInput.value}) }
+		
+	**local reference can be used anywhere in template file NOT in ts file
+		
+	to get access to local reference and any element directly from within ts code
+		fetch the local reference through @ViewChild
+			@ViewChild('serverContentInput') serverContentInput;
+			 newServerContent: this.serverContentInput.nativeElement.value
+			 
+directives
+	
+	Attribute Directives
+		look like a normal html attribute
+			possibly with databinding or event binding
+				[ngClass]="{odd: odd % 2 !== 0}"
+				[ngStyle]="{background-color: odd % 2 !== 0 ? 'yellow' : 'transparent'}"
+		**only affect/change the element they are added to
+		
+	sttructural Directives
+		look like a normal html attribute but have a leadding *
+			*ngIf
+			*ngFor
+		**affect a whole area in the DOM
+			elements get added/removed
+		**can not have two structural directives in the same element	
+	
+	create directive from cli
+		$ng g d <directive name>
+	
+	building own directive
+		create a file for directive
+			basic-highlight.directive.ts
+			
+		define a class in this file
+			**directives do not have view
+			
+		add class decorator
+			import { Directive } from @angular/core
+			
+		add selector to this directive because directive is placed in an element
+			**with [], selected as attribute
+			without [], selected as element
+			
+		add elementRef to the constructor
+			reference to the element this directive will be placed
+			**inject the element the directive sits on into this directive
+					constructor(private elementRef: ElementRef){}
+			**private makes this elementRef accessible everywhere in the class
+				make it became a property of this class
+				
+		manipulate this element in ngOnInit()
+			this.elementRef.nativeElement.style.backgroundColor = 'green'
+			
+		**add this directive to app.module.ts to inform angular
+			declarations: [BasicHighlightDirective]
+			
+		**use Renderer to set the attribute of an element
+			renderer.setStyle(elementRef.nativeElement, attribute, attribute_value)
+			
+		**use HostListener for reacting to events occuring the element the directive sits on
+			@HostListener('<event-name>') function-name(eventData: Event){ #function-behavior }
+		
+		use HostBinding to bind to element properties
+			@HostBinding('style.backgroundColor') backgroundColor: string
+		
+		**use custom property binding to allow user input for directive
+			**can do property binding of directive by placing these properties in the same element
+				defaultColor and highlightColor are properties of appBetterHighlight
+					<p appBetterHighlight [defaultColor]="'yellow'" [highlightColor]="'red'">
+			**set Input argument to be the name of the directive selector using alias
+				allows using the directive for property binding
+					@Input('appBasicHighLight') highlightColor: string = 'transparent'
+		
+		**angular tranforms structural directive into property binding
+			*ngIf to [ngIf] of ng-template			
+			ng-template itself does not render
+				<ng-template [ngIf]="!onlyOdd">
+					<div> content here </div>
+				</ng-template>
+				
+			#in basic-highlight.directive.ts file
+			@Directive({
+				selector: '[appBasicHighLight]'  
+				})
+			export class BasicHighlightDirective implements OnInit{
+				@Input() defaultColor: string = 'transparent';
+				@Input('appBasicHighLight') highlightColor: string = 'blue';
+				@HostBinding('style.backgroundColor') backgroundColor: string = this.defaultColor;
+				
+				constructor(private elementRef: ElementRef, private renderer: Renderer2){
+				}
+				
+				ngOnInit() {
+					this.elementRef.nativeElement.style.backgroundColor = 'green';
+				}
+				
+				@HostListener('mouseenter') mouseover(eventData: Event){
+					this.renderer.setStyle(this.elRef.nativeElement, 'background-color', 'blue', false, false);
+				}
+				
+				@HostListener('mouseleave') mouseleave(eventData: Event){
+					this.backgroundColor = 'transparent';
+				}
+				
+			}
+			
+			#in app.module.ts file
+			@ngModule(
+				{
+					declarations:[
+					AppComponent, 
+					BasicHighlightDirective
+					],
+				
+					imports: [
+						BrowserModule,
+						FormsModule,
+						HttpModule
+					],
+				}
+			)
+		
+			#in any template file
+			<p [appBasicHighLight]="'red'" [defaultColor]="'yellow'" > style me with basic directive ! </p>
+			
+	
+		creating own structural directive
+			create file using command line
+				$ng g d unless
+			
+			use @Input decorator to get the condition as input
+				directive will eventually transform to property binding
+					**make sure the property name matches the selector
+					@Input()appUnless
+				
+			use set to execute a method whenever the condition changes
+				implement setter with set keyword
+				**appUnless is still a property, appUnless() is a setter of the property execute whenever value changes
+					@Input() set appUnless(value: boolean){
+						if(!condiction){
+							this.vcRef.createEmbededView(this.templateRef);
+						}else{
+							this.vcRef.clear()
+						}
+					}
+				
+			need to get access to the template
+				private templateRef: TemplateRef<any>
+			need to get access to the view container
+				private vcRef: ViewContainerRef
+			
+		
+			@Directive({
+				selector: '[appUnless]'
+			})
+			export class UnlessDirective{
+				@Input() set appUnless(value: boolean){
+						if(!condiction){
+							this.vcRef.createEmbededView(this.templateRef);
+						}else{
+							this.vcRef.clear()
+						}
+					}
+				constructor(private templateRef: TemplateRef<any>, private vcRef: ViewContainerRef){}
+				
+				
+			}
+			
+
+routing
+	
+	setting up and loading routes
+		**regestering routes in app.module.ts
+			add constant appRoutes that holds all routes in our app
+			**each route is an instance of Routes
+				import { Routes } from "@angular/router";
+				const appRoutes: Routes = [ 
+					{path: '', component: HomeComponent},
+					{path: 'users', component: UsersComponent},
+					{path: 'servers', component: ServersComponent},
+					];
+		
+			**add RouterModule to imports array to app.module.ts
+			forRoot register routes for *main application
+				import { Routes } from "@angular/router";
+				imports: [
+					...imports,
+					RouterModule.forRoot( appRoutes )
+				]
+			
+			**inform angular *where to display the component template when route is selected
+				**add router-outlet *directive to app.component.html
+					<div class="row">
+						<div class="col-xs-12 col-sm-10 col-md-8">
+							<router-outlet> </router-outlet>
+						</div>
+					</div>
+
+	navigating with router links
+		add links to template
+			**do NOT use *href for links
+				**it will cause app to reload, app state will be lost
+			
+			**use routerLink which will NOT reload page
+				routerLink catches the click on element 
+					prevents default which will send the request 
+					parse the link and find the fitting route in configuration
+					
+					<li role="presentation" class="active"> <a routerLink="/servers"> servers </a> </li>
+					
+				use property binding on routerLink
+				*specify all segments of path as array elements
+				
+					<li role="presentation"> <a [routerLink]="[ '/servers' ]"> servers </a> </li>
+					
+			absolute path v.s relative path
+				absolute path appends to the end of root component path
+					absolute path starts with '/'
+						[routerLink]="[ '/servers' ]" => localhost:4200/servers
+				
+				relative path appends to the end of current component path
+					relative path starts without '/'
+					in localhost:4200/servers
+						[routerLink]="[ 'servers' ]" => localhost:4200/servers/servers
+						
+	style *active link		
+		use routerLinkActive *directive to specify css class for active link
+			
+			<li role="presentation" routerLinkActive="active"> <a [routerLink]="[ '/servers' ]"> servers </a> </li>
+		
+		routerLinkActive marks the current link and *links that lead to the current links as active
+			**marked as active if route is contained in anther route
+				this cause the *home tag always in active
+				
+			configure routerLinkActive with routerLinkActiveOptions to solve the problem
+				<li role="presentation" 
+					routerLinkActive="active"
+					[routerLinkActiveOptions]="{exact: true}"> 
+						<a routerLink="/"> Home </a> 
+				</li>
+
+				
+	navigating programmatically
+		load route programmatically in ts files
+			**need to have access to the router
+				**inject router in component constructor
+					
+					import { Router } from '@angular/router'
+					constructor(private router: Router){}
+					
+			call navigate() on router
+				**navigate() take array as argument, array elements are path segments
+					
+					onLoadServers(){
+						this.router.navigate(['/servers']);
+					}
+				
+				**navigate() path does NOT know the current loaded path
+					use ActivatedRoute to get access to current route
+						
+						import { ActivatedRoute } from '@angular/router'
+						constructor(private route: ActivatedRoute){}
+						
+					configure relative route with relativeTo
+						**it is relative to the home route by default
+						
+						onReload(){
+							this.router.navigate(['servers'], { relativeTo: this.route } )
+						}
+				
+	Fetching route parameters
+		**add parameters to route to encode data in path
+			**parameters are the dynamic segments in path
+				put *colon in front of parameters
+					to get single user with id
+					
+					const appRoutes: Routes = [
+						{ path: 'users/:id', component: UserComponent },
+					]
+				
+			localhost:4200/users/<anything not necessary id number> will load UserComponent
+	
+		**access data encode in path
+			*inject ActivatedRoute in constructor in ts file
+				ActivatedRoute has info about currently loaded route
+				
+				import { ActivatedRoute } from '@angular/router';
+				constructor( private route: ActivatedRoute ){}
+					
+			**retrieve data from currently loaded route using route.snapshot.params 
+				
+				user: {id: number, name: string};
+				ngOnInit(){
+					this.user = {
+						id: this.route.snapshot.params['id'],
+						name: this.route.snapshot.params['name'],
+					}
+				}
+				
+				// in app.module.ts also add :name to path
+				const appRoutes: Routes = [
+						{ path: 'users/:id/:name', component: UserComponent },
+					]
+				
+	Fetching route parameters reactively
+		**in ngOnInit(), we load data from snapshot when component is created 
+			**this only happens when we haven't been this component before
+			
+			if we are on the component and reload the page with new id and name
+				**Angular does NOT re-instanciate the component we are already on
+				
+				in users component template file
+					
+					<a [routerLink]="['/users', 10, 'Anna']"> load Anna </a>
+				
+				click on this link in user component will generate new route 
+					localhost:4200/users/10/Anna
+				but id and name of user object does NOT update to 10 and Anna
+			
+			**use route.params to react to subsequent changes on the route
+				*route.params is an observable from rxjs/core
+					**observable is used for *async tasks
+						*params of the current route is async because it may change in the future
+							*cannot blocked code and wait for params to change
+								*because does NOT know when it will happen and if it will happen
+							
+					**observable allow users to subscribe to some event which *may happen in the *future
+						then take action when it happens *without waiting for it now
+						
+					**subscribe() function takes three function as argument
+						**function passed to subscribe() need to know data type it will get from subscribe() 
+						first function pass subscribe() will be fired whenever new data is put into parameters
+				
+			use this.route.params.subscribe() when component will be reloaded from within itself 
+				**in this case, angular cleans up the subscription whenever the component is destroyed
+				
+				import { Subscription } from 'rxjs/Subscription';
+				paramsSubscription: Subscription;
+				ngOnInit(){
+					this.user = {
+						id: this.route.snapshot.params['id'],
+						name: this.route.snapshot.params['name'],
+					};
+					this.paramsSubscription = this.route.params.subscribe(
+						(params: Params)=> {
+							this.user.id = params['id'];
+							this.user.name = params['name'];
+						}
+					);
+				}	
+						
+			
+			**user should make sure that subscription is destroyed when component is destroyed
+				component is destroyed when user leave the page
+				component is re-created when user come back to page
+				**if subscription is not destroyed when component is destroyed
+					there will be memory leak
+					
+				**need to implement OnDestroy life cycle hook
+					
+					ngOnDestroy(){
+						this.paramsSubscription.unsubscribe();
+					}
+					
+	
+	passing query parameters and fragments
+		query parameters start with ? and separated with &
+			localhost:4200/users/10/Anna?mode=editing&active=true
+		fragmetns start with # to jump to specific place in application
+			localhost:4200/users/10/Anna?mode=editing&active=true#loading
+			
+		**use queryParams *property of routerLink *directive to set query parameters
+		**use fragment *property of routerLink *directive to see fragment
+			**there may only be one fragment
+			
+			new route in app.module.ts
+
+				{path: 'servers/:id/edit', component: EditServersComponent}
+						
+			for adding it in html file
+				in servers.component.html template file
+					
+					<a
+						[routerLink]="['/servers', server.id]"
+						[queryParams]="{allowEdit: server.id ===3 ? '1': '0'}"
+						[fragment]="'loading'"
+						class="list-group-item"
+						*ngFor="let server of servers">
+						{{server.name}}
+					</a>
+			
+			for adding it in ts file
+				in home.component.ts file
+				
+					onLoadServer(id: number){
+						this.router.navigate(
+							[ '/servers', id, 'edit' ],
+							{ queryParams: { allowEdit: '1' }, fragment: 'loading' }
+						);
+					}
+		
+	retrieve query parameters and fragment
+		need ActivatedRoute, inject it in constructor
+			
+			in edit-server.component.ts
+			
+				import { ActivatedRoute } from '@angular/router'
+				allowEdit = false;
+				constructor(private route: ActivatedRoute){}
+				ngOnInit(){
+					// to instantiate value *when component is created
+					console.log(this.route.snapshot.queryParams['allowEdit']);
+					console.log(this.route.snapshot.fragment);
+					// to react to value changes when component reloaded from within itself
+					this.route.queryParams.subscribe(
+						(queryParams: Params) => {
+							this.allowEdit = queryParams['allowEdit'] === '1'? true: false;
+						} 
+					);
+					this.route.fragment.subscribe()
+				}
+			
+	using query parameters
+		navigate to edit-server.component from server.component
+			**append 'edit' to the end of currently loaded route
+				*use {relativeTo: this.route}
+			
+			**need to also preserve *query parameters when moving from server.component to edit-server.component
+				when we are in server.component
+					localhost:4200/servers/2?allowEdit=0#loading
+				when we move to edit-server.component
+					localhost:4200/servers/2/edit
+				*query parameters and fragment lost
+		
+			**use queryParamsHandling 
+				'merge' to merge old query parameters with new query parameters
+				'preserve' to preserve query parameters
+					
+			
+				in server.component.ts
+				
+				import {ActivatedRoute, Params, Router} from '@angular/router';
+				constructor(private route: ActivatedRoute, private router: Router){}
+				onEdit(){
+					this.router.navigate(['edit'], {relativeTo: this.route, queryParamsHandling: 'preserve'})
+				
+				}
+			
+			
+	dynamically adding data to link
+		add user id and name to link
+			<a
+				[routerLink]="['/users', user.id, user.name]"
+				class="list-group-item"
+				*ngFor="let user for users">
+				{{user.name}}
+			</a>
+		
+	converting string to number using "+"
+		id = +this.route.snapshot.params['id'];
+
+	
+	**setting up child nested routes
+		**add child routes with *children which takes an array of routes
+			*paths inside children are relative to parent
+		
+		in app.module.ts file, change servers routes
+			
+			//before
+			const appRoutes: Routes = [ 
+					{path: '',                 component: HomeComponent},
+					{path: 'users',            component: UsersComponent},
+					{path: 'users/:id/:name',  component: UsersComponent},
+					{path: 'servers',          component: ServersComponent},
+					{path: 'servers/:id',      component: ServerComponent},
+					{path: 'servers/:id/edit', component: EditServerComponent},
+			];
+			//after
+			const appRoutes: Routes = [ 
+					{path: '',                 component: HomeComponent},
+					{path: 'users',            component: UsersComponent},
+					{path: 'users/:id/:name',  component: UsersComponent},
+					
+					{path: 'servers',
+					 component: ServersComponent, 
+					 children:[
+							{path: ':id',      component: ServerComponent},
+							{path: ':id/edit',  component: EditServerComponent},	
+						]
+					},
+			];
+		
+		
+		**child routes need a separate outlet
+			**<router-outlet> </router-outlet> in app component is for routes on top level
+				*Not for child routes
+		
+		**child components should be loaded nested into the parent component
+			**add <router-outlet> </router-outlet> in the parent component
+				**all child components of child routes will be loaded here 
+			
+			in servers.component.html file
+				
+				<div class="col-xs-12 col-sm-4">
+					<router-outlet> </router-outlet>
+				</div>
+			
+			
+	redirecting and wild card	
+		**handle paths NOT defined in our route
+			"localhost:4200/something-random" will result an error
+		**need to redirect user to default page when user try to visit page we do NOT have
+			generate new component page-not-found.component
+			add route to the *end of our routes 
+				**angular matches routes from top to bottom and use the first one that matches
+					**default pages and wild cards need to be in the the *end of all routes
+		**use *redirectTo to redirect to another path
+		** use "**" wild card route to catch all other routes NOT defined in our appRoutes
+			**wild card route *must in the *end of the appRoutes
+			
+			in app.module.ts
+			
+			const appRoutes: Routes = [
+				...appRoutes,
+				{path: 'not-found', component: PageNotFoundComponent }
+				{path: '**', redirectTo: '/not-found' }
+			
+			]
+		
+	outsourcing the route configuration
+		in app.module.ts, remove RouterModule.forRoot(appRoutes) from imports array
+		add new *module file app-routing.module.ts
+			decorate the class definition with @NgModule()
+			add imports array with RouterModule.forRoot(appRoutes) to @NgModule
+				
+				const appRoutes: Routes = [ 
+					// all path configurations here
+				];
+				
+				@NgModule(
+					{
+						imports: [ RouterModule.forRoot(appRoutes) ],
+						exports: [ RouterModule ]
+					}
+				)
+				export class AppRoutingModule{}
+		
+		**add AppRoutingModule back to appModule
+			**add exports array into NgModule decorator
+				**in exports array, define what should be accessible to module that import this module
+				
+		**in appModule, import AppRoutingModule in the imports array
+			import { AppRoutingModule } from './app-routing.module';
+			imports: [ ...imports, AppRoutingModule ]
+			
+	
+	**protecting routes with guards
+		guards are logics we want to execute before loading route or leaving route
+		
+		**canActivate guard
+			add new file in root level, auth-guard.service.ts
+				**add class that implements the *CanActivate *interface
+				**CanActivate interface has *canActivate() method
+					canActivate() method takes two arguments
+						route: ActivatedRouteSnapshot
+						state: RouterStateSnapshot
+					canActivate() method returns
+						Observable<boolean> |
+						Promise<boolean> |
+						boolean
+					**canActivate can run async or sync
+				**Angular will execute this code before the route is loaded
+					so angular will	pass in this arguments
+				
+				canActivate() calls the AuthService for user authentication
+					**need to add @Injectable declarator
+					**need to add AuthService as argument to constructor
+				**canActivate handles promise returned from AuthService 
+					**promise handling function knows what type of value will return from promise
+						in this case a boolean
+				**if promise return false, need to navigate away
+						in this case go back to home page
+								
+			add new file in root level, auth.service.ts
+				**in real app, this service will reach out to server for user authentication		
+				
+			need to declare which routes will be protected by this guard
+				**add *canActivate property to route
+				**canActivate takes an *array of guards that will be applied to the route
+				**canActivate guards apply to both route and its children routes
+				
+			protecting child routes with canActivateChild
+				**implement CanActivateChild interface
+				**implement canActivateChild() method of the interface
+				**add *canActivateChild property to route
+				**canActivateChild takes an *array of guards that will be applied to the route
+				**canActivateChild guards apply to children routes
+				
+		//-------------- auth.service.ts --------------------------------------------
+			export class AuthService{
+				loggedIn = false;
+				
+				//simulating reaching out to server with setTimeout()
+				isAuthenticated(){
+					const promise = new Promise(
+						(resolve, reject) => {
+							setTimeout( resolve(this.loggedIn) , 800);
+						}
+					);
+					return promise
+				
+				}
+				
+				login(){
+					this.loggedIn = true;
+				}
+			
+				logout(){
+					this.loggedIn = false;
+				}
+			}
+				
+		//--------------- auth-guard.service.ts ---------------------------------------		
+			@Injectable()
+			export class AuthGuard implements CanActivate, CanActivateChild{
+				constructor( private authService: AuthService,
+							 private router: Router) {}
+							 
+				canActivate(route: ActivatedRouteSnapshot,
+							state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+					return this.authService.isAuthenticated().
+						then(
+							(authenticated: boolean) => {
+								if (authenticated){
+									return true;
+								}else{
+									this.router.navigate(['/']);
+								}
+							}
+						)
+				}
+				
+				canActivateChild(route: ActivatedRouteSnapshot,
+							state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+					return this.canActivate(route, state)		
+				}
+			}
+		
+		//----------------- app-routing.module.ts ---------------------------------------
+			const appRoutes: Routes = [ 
+					{path: '',                 component: HomeComponent},
+					{path: 'users',            component: UsersComponent},
+					{path: 'users/:id/:name',  component: UsersComponent},
+					
+					{path: 'servers',
+					 component: ServersComponent, 
+					 // canActivate: [AuthGuard],
+					 canActivateChild: [AuthGuard],
+					 children:[
+							{path: ':id',      component: ServerComponent},
+							{path: ':id/edit',  component: EditServerComponent},	
+						]
+					},
+			];
+			
+		//---------------- app.module.ts --------------------------------------------------
+			providers: [ ...providers, AuthService, AuthGuard ]
+	
+	
+	
+	use fake service to login and logout users
+		add two buttons in home page login and logout
+		
+			<button class="btn btn-default" (click)="onLogin()">Login</button>
+			
+		add onLogin() onLogout() methods to home.component.ts file
+			
+			constructor(private authService: AuthService){}
+			onLogin(){ this.authService.login(); }
+	
+
+	**controlling navigation with canDeactivate
+		controlling user leaving a route
+		add changesSaved variable in edit-server.component.ts
+			changesSaved set to true when update button is clicked
+			**user allowed to leave page when changesSaved is true
+				**otherwise raise warning message
+		**Guard always need to be service
+			add new file can-deactivate-guard.service.ts in edit-server directory
+				create *interface CanComponentDeactivate with *canDeactivate() method
+					**this interface connects the Guard and the component we are currently on
+					canDeactivate returns Observable<boolean> | Promise<boolean> | boolean
+				
+				create *class CanDeactivateGuard which implements CanDeactivate interface
+					*CanDeactivate interface imported from @angular/router
+					**CanDeactivate is generic type
+						**it wraps the CanComponentDeactivate interface defined by us
+							**the purpose is to connect our *component with *CanDeactivateGuard
+								CanDeactivate<CanComponentDeactivate>
+					**CanDeactivate interface has canDeactivate() method
+						**canDeactivate() method will be called by angular router 
+							when user try to leave a route
+						**canDeactivate() method takes *component as argument
+							**component of type CanComponentDeactivate
+					**canDeactivate() method calls the component's canDeactivate() method
+						**because component is type CanComponentDeactivate
+						
+		**EditServerComponent need to implement the CanComponentDeactivate interface
+			**need to implement canDeactivate() method in EditServerComponent component
+			
+			export class EditServerComponent implements OnInit, CanComponentDeactivate {
+				canDeactivate(): Observable<boolean> | Promise<boolean> | boolean{
+					if (!this.allowEdit){
+						return true;
+					}
+					if((this.serverName !== this.server.name || this.serverStatus !== this.server.status)
+						&& !this.changesSaved){
+						return confirm('Do you want to discard the changes?");
+						}
+					else{
+						return true;
+					}
+				}
+			}
+			
+		add canDeactivate property to the path configuration in app-routing.module.ts
+			{path: ':id/edit', component: EditServerComponent, canDeactivate: [CanDeactivateGuard] }
+		add CanDeactivateGuard to providers array in app.module.ts
+			providers: [ ...providers, CanDeactivateGuard],
+		
+		//---------------------- can-deactivate-guard.service.ts -------------------------------------
+		export interface CanComponentDeactivate{
+			canDeactivate:() => Observable<boolean> | Promise<boolean> | boolean;
+		}
+		export class CanDeactivateGuard implements CanActivate<CanComponentDeactivate> {
+			canDeactivate(component: CanComponentDeactivate,
+						  currentRoute: ActivatedRouteSnapshot,
+						  currentState: RouterStateSnapshot,
+						  nextState?: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {						  
+				
+				return component.canDeactivate();
+						  
+						  }
+		}
+Services
+	what are services
+		place for centralizing code
+			logging
+			data storage
+			
+	create logging service
+		create a file and class inside this file
+			logging.service.ts
+		service is normal typescript class
+			**no class decorator is needed
+		do NOT create service instances manually
+			angular provides dependancy injector 
+				*better way to access service by having service stay in angular's ecosystem
+	
+	injecting service into *components
+		hierarchical injector
+			inject dependancy instances into our class automatically
+		**need to inform angular about dependancy on service
+			*use constructor()
+				constructor(private loggingService: LoggingService){}
+		**need to tell angular how to create this service
+			*add providers array to @Component decorator
+				@Component({providers: [LoggingService]})
+		using the service created by angular
+			this.loggingService.logStatusChange(accountStatus);
+						
+	creating data service
+		create a file and class inside this file
+			account.service.ts
+			export class AccountsService{}
+		add AccountsService to AppComponent
+			accounts: {name: string, status: string}[] = []
+			constructor(private accountsService: AccountsService){}
+			ngOnInit(){this.accounts = this.accountsService.accounts;}
+		add AccountsService to NewAccountComponent
+			@Component({providers:[AccountService]})
+				**should NOT put it in the providers array
+				**Angular will create a new AccountService instance and override the one from AppComponent
+			constructor(private accountsService: AccountsService){}
+			onCreateAccount(accountName: string, accountStatus: string){
+				this.accountsService.addAccount(accountName, accountStatus); }
+		add AccountsService to AccountComponent
+			@Component({providers:[AccountService]})
+				**should NOT put it in hte providers array
+				**Angular will create a new AccountService instance and override the one from AppComponent
+			constructor(private accountsService: AccountsService){}
+			onSetTo(status: string){
+				this.accountsService.updateStatus(this.id, status);}
+		**A component cannot see updates made to service by another component
+			**because there are three instances of AccountService
+				AccountService instances in AccountComponent and NewAccountComponent 
+				override the one from AppComponent
+	
+	understanding the hierarchical injector
+		angular dependancy injector is a hierarchical injector
+			angular provider creates a service instance for a component
+				**This component and all its child components will receive the same service instance
+		**AppModule
+			same instance of service is available application-wide
+				service declared in AppModule's provider array
+		**AppComponent
+			same instance of service is available for *all Components (but not for other services)
+		**any other component
+			same instance of service is available for the component and all its child component
+			
+	injecting service to service
+		add loggingService to AccountsService
+			constructor(private loggingService: LoggingService){}
+		**need to add @Injectable() class decorator to the service class
+			@Injectable()
+			export class AccountService{}
+		
+	**using services for cross-Component communication
+		without services child_1 -> parent -> child_2
+			child component emit event to parent component
+			parent component catch the event
+			parent component pass data down to another child via property binding
+		
+		**with service
+			add EventEmitter to accountsService
+				statusUpdated = new EventEmitter<string>();
+			child_1: call this EventEmitter in AccountComponent's onSetTo(status: string)
+				this.accountsService.statusUpdated.emit(status)
+			child_2: listen to this event and throw alert in constructor()
+				this.accountsService.statusUpdated.subscribe(
+					(status: string) => alert('New status: ' + status)
+				);
+		
+			
+	
+				
+				
+Forms
+	**forms are NOT submitted to server
+	**forms are handle through angular
+		which then use angular http service submit to server
+	
+	Angular and forms
+		angular allow user to retrieve value entered in form
+		need object representing form in typescript class
+			key value pairs
+	
+	**Angular offers two ways handling forms
+		template driven
+			form set up in template
+			angular infers the form object from the DOM
+		reactive
+			form is created programmatically and synchronized with the DOM
+	
+	template driven
+		**everything done to form happens in template
+		<form> element has no 'action' and 'method' attribute
+			because form should not be submitted to server
+			
+		add 'FormsModule' to imports:[] in app.module.ts
+			angular will generate form object when it sees <form> element in template file
+				**need register controls manually
+					add 'ngModel' and 'name' to <input> element
+						<input ngModel name="username">
+		
+		submitting form
+			add 'ngSubmit' *directive to <form> element
+				<form (ngSubmit)="onSubmit()">
+			add '#f' reference to <form> element to get access to form created by angular
+				<form (ngSubmit)="onSubmit(f)" #f="ngForm">
+				onSubmit(form: ngForm){...}
+		
+		form state
+			form object of ngForm type has many useful properties
+				dirty: whether form is modified
+				controls: list of controls registered by user
+				valid: whether form values are valid
+				touch: whether form field is clicked
+				
+		accessing form with @ViewChild
+			**allow user to access form before it is submitted
+				@ViewChild('f') signupForm: NgForm;
+				onSubmit(){ console.log(this.signupForm); }
+				
+		adding validation to check user input
+			Not empty input
+				add 'required' *directive to <input> element
+					<input ngModel name="username" required>
+			email input
+				add 'email' *directive to <input> element
+					<input ngModel name="email" required email>
+		
+		using the form state
+			*angular checks the state of each control
+				and condictionally adds the correponding *css class
+			disable submit button if form is not valid using *property binding
+				<button type="submit" [disabled]="!f.valid">
+			use ng-invalid css class to highlight invlid form input field
+				input.ng-invalid.ng-touched { border: 1px solid red; }
+				
+		outputting validation error message
+			**ngModel exposes info about the control it created for an element
+			**get access to control of element using *local reference
+				<input ngModel name="email" required email #email='ngModel'>
+				<span *ngIf="!email.valid && email.touched"> invalid email!</span>
+			
+		set default value with ngModel property binding
+			**add ngModel to element with property binding
+				<select [ngModel]="defaultQuestion" name="secret">
+					<option value="pet"> your first Pet? </option>
+				in ts class
+					defaultQuestion = 'pet';
+		
+		use ngModel for two-way-binding
+			**will still have the default input value when use ngModel with two-way-binding
+				<textarea name="questionAnswer" [(ngModel)]="answer"> </textarea>
+				<p> Your reply: {{answer}}</p>
+			
+		grouping form controls
+			use ngModelGroup directive on <div> element containing multiple <input> elements
+				example for grouping username and email into one group userData
+					<div ngModelGroup="userData"> username and email element here </div>
+				userData becomes a control with all properties of other controls
+				add local reference to have access to control created by ngModelGroup
+					<div ngModelGroup="userData" #userData="ngModelGroup"> username and email element here </div>
+					<p *ngIf="!userData.valid && user.touched">User Data is invalid!</p>
+					
+		handling radio buttons
+			add ngModel to each input of radio type
+				<input type="radio" name="gender" ngModel [value]="gender" required>
+					
+		setting and patching form values
+			@ViewChild('f') signupForm: NgForm;
+			use setValue()which sets all values of the form
+				this.signupForm.setValue({ value for each form input here })
+			better approach is to set only single input value of form
+				patchValue() override single value of form
+				setValue() set all value of form
+				this.signupForm.form.patchValue({ userData: { username: suggestedName} });
+				
+		using form data
+			onSubmit(){
+				this.user.userName = this.signupForm.value.userData.username;
+				this.user.email = this.signupForm.value.userData.email;
+				this.user.secretQustion = this.signupForm.value.secret;
+				this.user.answer = this.signupForm.value.questionAnswer;
+				this.user.gender = this.signupForm.value.gender;
+			
+			
+			}
+				
+		resetting form
+			call reset() to reset form input value
+				onSubmit(){
+					......
+					this.signupForm.reset();
+				}
+				
+	Reactive approach
+		form is created programmatically and synchronized with the DOM
+		
+		create FormGroup in ts file
+			form is group of controls
+				signupForm: FormGroup;
+			add *ReactiveFormsModule to imports:[] in app.module.ts
+				*notice: template driven uses FormsModule
+			
+		creating a form
+			form should be created before rendering the template
+				create form in onInit()
+					this.signupForm = new FormGroup({})
+				FormGroup contains group of controls which are key value pairs
+					new FormGroup({'username': new FormControl(null)})
+				arguments to FormControl
+					FormControl(initialValue, validators, asyncValidators )
+				
+		syncing HTML and Form
+			tell angular to use FormGroup created in ts file, do not infer its own form from template
+				<form [formGroup]="signupForm">
+			tell angular to connect controls from ts file with input fields from template
+				<input type='text' id='username' [formControlName]="'username'">
+		
+		submitting the form
+			add ngSubmit event listener to <form> element, no need to pass form reference to onSubmit()
+				<form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+			onSubmit() takes NO argument because form is created in ts file 
+				onSubmit(){console.log(this.signupForm);}
+				
+		adding validation
+			**configuring the form in ts file
+			pass reference to a validator method to FormControl
+				'username': new FormControl(null, Validators.required )
+			angular will execute Validators.required method whenever it detect changes made in input
+				'email': new FormControl(null, [Validators.required, Validators.email] )
+			
+		getting access to control
+			get state of a field through get() of signupForm object defined in ts file
+				<span *ngIf="!signupForm.get('userName').valid && signupForm.get('username).touched"> 
+					please enter a valid username ! </span>
+			get state of overall form without get()
+				<span *ngIf="!signupForm.valid && signupForm.touched"> 
+					please enter a valid data ! </span>
+		
+		grouping control
+			use FormGroup within FormGroup to group FormControl
+				in ts file, onInit() method, new FormGroup() constructor
+					'userData': new FormGroup({'username': new FormControl(), 'email': new FormControl()}),
+				in template file, add <div> element with formGroupName *directive
+					<div formGroupName="userData">
+				**formControlName tells angular which property in ts form object relate to which input
+				**formGroupName tells angular the same for formGroup
+		
+		array of form controls
+			FormArray holds an array of controls, array argument can be empty in the beginning. in onInit() method
+				'hobbies': new FormArray([])
+			add controls into FormArray in onAddHobby() method, **need to cast <FormArray>
+				(<FormArray>this.signupForm.get('hobbies')).push(new FormControl(null));
+			sync template with ts file
+			**name for each control in array is the index of this control in array
+				<div formArrayName="hobbies">
+					<h4>Your Hobbies</h4>
+					<button
+						type="button"
+						(click)="onAddHobby()"> Add Hobby </button>
+					<div class="form-group"
+						*ngFor="let hobbyControl of signupForm.get('hobbies').controls; let i = index">
+						<input type="text" class="form-control" [formControlName]="i">
+					</div>
+				</div>
+			
+		creating custom validator
+			validator is just function executed by Angular automatically when it checks validity of form control
+			**validator function should receive control as argument
+			**validator function should return object of one key value pair
+				key is string
+				value is blean
+			**validation does not return false, like {'nameIsForbidden': false}
+			**return null or do not return anything to tell angular form is valide
+				forbiddenNames(control: FormControl): {[s: string]: boolean}{
+					if (this.forbiddenUserNames.indexOf(control.value) !== -1){
+						return {'nameIsForbidden': true};
+					}
+					return null;
+				}
+			add custom validator to validator array, 
+				**need to bind "this" because we are not calling forbiddenNames from inside the ts class
+				angular will call it when checking the validity and "this" does not refer to ts class at that time
+					'username': new FormControl(null, [Validators.required, this.forbiddenNames.bind(this)]),
+			
+		using error code
+			angular adds errors code to individual control's error object
+			use this errors code for more granular control of error message
+				<span *ngIf="!signupForm.get('userData.username').valid && signupForm.get('userData.userName).touched">
+					<span *ngIf=signupForm.get('userData.username').errors['nameIsForbidden']"> name invalid </span>
+					<span *ngIf=signupForm.get('userData.username').errors['required']"> name required </span>
+				</span>
+				
+		creating custom async validator
+			async validator returns Observable<andy> | Promise<any> 
+				forbiddenEmails(control: FormControl): Promise<any> | Observable<any> {
+					const promise = new Promise<any>((resolve, reject)=>{
+						setTimeout(()=>{
+							if (control.value === 'test@test.com'){
+								resolve({'emailIsForbidden': true});
+							}else{
+								resolve(null);
+							}
+						}, 1500);
+					});
+					return promise;
+				}
+			add async validator to async validator array
+				'email': new FormControl(null, [validators.required, Validators.email, this.forbiddenEmails)
+		
+		reacting to status or value changes
+			form object has two observables
+				this.signupForm.valueChanges
+					this.signupForm.valueChanges.subscribe( (value) => console.log(value) )
+				this.signupForm.statusChanges.
+					this.signupForm.statusChanges.subscribe( (value) => console.log(value) )
+					
+	    settig and patching value
+			set value for whole form
+				this.signupForm.setValue({
+					'userData':{
+						'username': 'Jin',
+						'email': 'jinli@berkeley.edu'
+					}
+					'gender':  'male',
+					'hobbies': []
+				});
+			set value for part for the form
+				this.signupForm.patchValue({
+					'userData':{
+						'username': 'Jin',
+					}
+				})
+			
+Modules
+	Idea behind App Modules
+		tell angular what our App consist of
+			what elements are available behind an App
+		
+		*module is a class with @NgModule decorator
+			
+			@NgModule({
+				imports: [RouterModule.forRoot(appRoutes)],
+				exports: [RouterModule]
+			})
+			export class AppRoutingModule {}
+		
+		*module bundles certain functionalities and we can import them
+		
+	understanding the App module
+		*app module define how our App looks like to angular
+			'declarations' 
+				array define which components, directives or pipes a module uses
+			'imports'
+				**array define which other modules this moudule uses
+				**when we import another module, we import everything the module *export for us
+			'exports'
+				array of functionality we want to expose to other modules
+			'providers'
+				array of services use in this module
+					in the App module, 
+						everything provided in this array will be provided for the whole app
+						one instance of each service for the whole app
+			'bootstrap'
+				array defines what is our *root component
+					root component is that starting point of what we see
+				
+		app module basically wraps our app and defines which feature we use			
+		
+	understanding feature modules
+		feature module is a *custom module built by us
+			contains components and directives make up a feature of our app
+				for example: all recipe related components
+		
+		app module then import feature module
+			NOT performance boost gain by creating separate module
+			*but app module become leaner and easier to *maintain
+			easier to see which elements belong to which feature
+				
+			
+	creating feature module for recipe
+		add file recipes.module.ts file to 'recipes' directory
+			add *class RecipesModule in file
+				**add decorator @NgModule() to transform class into module
+			
+		**only move element from App module into feature module 
+			if element is *ONLY used in the feature module *NOT in whole App
+				example: recipeService stays in App module because it is used in whole App
+		
+		**make sure to import the 'commonModule' in imports array
+			*commonModule gives access to common directives
+				ngIf, ngFor....
+			**BrowserModule contains all the features in commonModule
+				*App module uses the BrowserModule
+				
+		**element can not be declared in more than one module
+			components, pipes, directives can NOT be in more than one module
+		
+		**module is only able to use what is defined in the module
+			*modules in the imports array in App module do NOT propagate to feature modules
+				example: AppRoutingModule imported in App module not available in feature module
+			
+			@NgModule({
+				declarations: [
+					RecipesComponent,
+					RecipesStartComponent,
+					RecipesListComponent,
+					RecipesEditComponent,
+					RecipesDetailComponent,
+					RecipesItemComponent,
+					DropdownDirective
+				],
+				imports: [
+					CommonModule,
+					ReactiveFormsModule
+				]
+				
+			})
+			export class RecipesModule{}
+		
+		
+		
+		
+		
+		
+		
+	
+		
+		
+		
+			
+	
+		
+		
+
+				
