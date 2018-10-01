@@ -1483,7 +1483,7 @@ Modules
 		
 		**export elements in the exports array allowing other modules to use them
 			*add 'DropdownDirective' in exports array
-				because everything declared in module is only available in this module
+				need to export it because everything declared in module is only available in this module
 			*to make some elements accessible from outside
 				need to explicitly export them
 			*elements in the exports array do NOT need to be imported in the imports array
@@ -1492,7 +1492,7 @@ Modules
 			add SharedModule to the imports array in app.module.ts 
 			add SharedModule to the imports array in recipes.module.ts
 					
-		**any element such as component, directive, pipe need to be declared somewhere in the app
+		**elements such as component, directive, pipe need to be declared somewhere in the app
 			**and only declare once
 			
 		//---------------------------------- shared.module.ts --------------------------------------
@@ -1511,7 +1511,8 @@ Modules
 	selector V.S routing in modules
 	
 		*for 'shoppingListComponent', its selector and route is declare in different modules 
-			*that are not related to each other
+			app-routing.module.ts and shopping-list.module.ts
+			*they are not related to each other
 				**no reference between app-routing.module.ts and shopping-list.module.ts
 			
 			route for 'shoppingListComponent' is declared in the app-routing.module.ts
@@ -1534,7 +1535,6 @@ Modules
 		
 		**selector has to be declared in the module where it is used
 			**or import a module which exports that component
-			so 
 			
 		**for routing, only need to make sure it is declared somewhere before accessing this route
 			it is not important to declare a component in the same module file as the route live
