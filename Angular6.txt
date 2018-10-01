@@ -1495,7 +1495,6 @@ Modules
 		**any element such as component, directive, pipe need to be declared somewhere in the app
 			**and only declare once
 			
-			
 		//---------------------------------- shared.module.ts --------------------------------------
 		@NgModule({
 			declarations: [
@@ -1508,7 +1507,7 @@ Modules
 		})
 		export class SharedModule {}
 		
-	
+		
 	selector V.S routing in modules
 	
 		*for 'shoppingListComponent', its selector and route is declare in different modules 
