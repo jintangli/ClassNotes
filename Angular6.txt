@@ -1384,22 +1384,25 @@ Modules
 			add *class RecipesModule in file
 				**add decorator @NgModule() to transform class into module
 			
-		**only move element from App module into feature module 
-			if element is *ONLY used in the feature module *NOT in whole App
+		**only move element 
+			*from App module into feature module 
+			*if element is *ONLY used in the feature module *NOT in whole App
 				example: recipeService stays in App module because it is used in whole App
 		
-		**make sure to import the 'commonModule' in imports array
+		**make sure to import the 'commonModule' in imports array of *every feature module
 			*commonModule gives access to common directives
 				ngIf, ngFor....
 			**BrowserModule contains all the features in commonModule
 				*App module uses the BrowserModule
 				
 		**element can not be declared in more than one module
-			components, pipes, directives can NOT be in more than one module
+			**components, pipes, directives can NOT be in more than one module
 		
 		**module is only able to use what is defined in the module
 			*modules in the imports array in App module do NOT propagate to feature modules
 				example: AppRoutingModule imported in App module not available in feature module
+			**service is an exception
+				RecipeService stays in App module and still available to other feature modules
 			
 			@NgModule({
 				declarations: [
@@ -1420,11 +1423,151 @@ Modules
 			export class RecipesModule{}
 		
 		
+	registering routes in a feature module
+		**if we create feature module we also need to move all the routes related to the feature module
+			
+		add new file recipes-routing.module.ts to 'recipes' directory
+			**move all the recipe related routes from app-routing.module.ts into this file
+				
+		**add RouterModule.forChild() in imports array
+			**use RouterModule.forChild() here, NOT RouterModule.forRoot() as in app-routing.module.ts
 		
+		**general rule registering routes using RouterModule
+			**only call forRoot() in App Module
+			**call forChild() anywhere else 
 		
+		**everything will be imported into the app module 
+			directly or indirectly
+			
+		**add RouterModule into exports array 
+			add RecipesRoutingModule in imports array in recipes.modules.ts
+				add RecipesModule in imports array in app.module.ts
+				
+		//----------------- recipes-routing.module.ts --------------------------------		
+		const recipesRoutes: Routes = [
+			{path: 'recipes', component: RecipesComponent, children: [
+				{path: '' component: RecipeStartComponent},
+				{path: 'new' component: RecipeEditComponent, canActivate: [AuthGuard] },
+				{path: ':id' component: RecipeDetailComponent},
+				{path: ':id/edit' component: RecipeEditComponent, canActivate: [AuthGuard]},
+			]},
+		];
+			
+		@NgModule({
+			imports: [
+				RouterModule.forChild(recipesRoutes)
+			],
+			exports: [RouterModule]
+		})
+		export class RecipesRoutingModule {}
+			
+			
+	understanding feature modules
+		**share module contains elements that are shared
+			between feature modules
+			between app module and feature module
+				example: directive that is share between app module and feature module
+	
+	creating a shared module
+		**share module is a normal module
+			*it only differs regarding how we use it
+			*the idea is that we are able to import share modules into other modules
 		
+		add the shared module in existing 'shared' directory
+			add file shared.module.ts file
 		
+		**typically only *one shared module for the whole app
 		
+		**add elements we want to share in declarations array
+			*add 'DropdownDirective' in declarations array
+		
+		**export elements in the exports array allowing other modules to use them
+			*add 'DropdownDirective' in exports array
+				because everything declared in module is only available in this module
+			*to make some elements accessible from outside
+				need to explicitly export them
+			*elements in the exports array do NOT need to be imported in the imports array
+		
+		**add SharedModule to the imports array of the module that want to use 'DropdownDirective' 
+			add SharedModule to the imports array in app.module.ts 
+			add SharedModule to the imports array in recipes.module.ts
+					
+		**any element such as component, directive, pipe need to be declared somewhere in the app
+			**and only declare once
+			
+			
+		//---------------------------------- shared.module.ts --------------------------------------
+		@NgModule({
+			declarations: [
+				DropdownDirective
+			],
+			exports: [
+				commonModule,
+				DropdownDirective
+			]
+		})
+		export class SharedModule {}
+		
+	
+	selector V.S routing in modules
+	
+		*for 'shoppingListComponent', its selector and route is declare in different modules 
+			*that are not related to each other
+				**no reference between app-routing.module.ts and shopping-list.module.ts
+			
+			route for 'shoppingListComponent' is declared in the app-routing.module.ts
+			
+				{ path: 'shopping-list', component: ShoppingListComponent }
+			
+			selector for 'shoppingListComponent' is declared in shopping-list.module.ts
+			
+				@NgModule({
+					declarations: [
+						ShoppingListComponent,
+						ShoppingEditComponent
+					],
+					imports:[
+						CommonModule,
+						FormsModule
+					]
+				})
+				export class ShoppingListModule { }
+		
+		**selector has to be declared in the module where it is used
+			**or import a module which exports that component
+			so 
+			
+		**for routing, only need to make sure it is declared somewhere before accessing this route
+			it is not important to declare a component in the same module file as the route live
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 	
 		
 		
