@@ -1539,11 +1539,112 @@ Modules
 		**for routing, only need to make sure it is declared somewhere before accessing this route
 			it is not important to declare a component in the same module file as the route live
 			
+	
+	understanding lazy loading
+		whole js bundle is downloaded at the beginning when user visits the page
+			lots of the code might never be used if the user never visit the page
+			**we can lazily a feature module and its child router
+				module is only loaded if user actually visit a route leading to this module
+	
+	adding lazy loading to the recipes module
+		add home component to app
+			because currently we alway land on the recipe page when user log in
+		
+		modify app-routing.module.ts file to use HomeComponent
 			
+			const appRoutes: Routes = [
+				{path: '', component: HomeComponent},
+				....
+			]
+		
+		load the recipe module lazily
+			currently recipe module is always loaded eagerly 
+				because it is in the imports array of app module
+				
+			app is bootstrap with the app module
+				everything listed in AppModule imports array is imported
+					currently our app has no performance boost
+						because all feature modules are listed in the imports array
+						
+				@NgModule({
+					imports: [
+						....
+						recipesModule,
+						....				
+					],
+				})
+				export class AppModule {}
 			
+			**need to move the recipesModule from the imports array
+				
+			**put the route for recipes back to *app-routing.module.ts
+				*use loadChildren
+					**pointing the module *path
+					**need to specify the *class name with '#'
+					
+				**loadChildren uses *string, NOT component type
+					**if we use component type, we will need to import it 
+					**import statement will cause it to be included in initial bundle
+					**then we will no longer have the lazy loading effect
+				
+				const appRoutes: Routes = [
+					....
+					{path: 'recipes', loadChildren: './recipes/recipe.module#RecipesModule},
+					....
+				];
 			
+			**also need to change the recipesRoutes in recipes-routing.module.ts
+				because the 'recipes' path is added back to appRoutes
+					change it from 'recipes' to ''
+						*because we want to load RecipesComponent at '/recipes' NOT '/recipes/recipes'
+					
+					const recipesRoutes: Routes = [
+						{path: '', component: RecipesComponent, children: [
+							{path: '', component: RecipeStartComponent},
+							{path: 'new', component: RecipeEditComponent, canActivate: [AuthGuard]},
+							....
+						]},
+					];
+				
+			**verify lazy loading in the network tab of the angular bebugging plugin
+				**make sure disable caching is checked
+				
+	how modules and service injection works
+		**a 'Root Injector' is created by angular at the point the application starts
+			**there is only *one 'Root Injector'
+			**all the services we provided in all the *eager loaded modules are added to 'Root Injector'
+				**there is only *one instance of each services
+				**app module and eager loaded feature modules all *share this instance of service
+					**even this service is declared in both 'providers' arrays of app module and feature module
+			**if we inject this service in the lazy loaded feature module
+				it would be there for all to use/share this one instance
+				**service is injected through constructor
+					**And this service is not declared in 'providers' array of lazy loaded feature module
+		
+		*if service is declared in 'providers' array of all modules
+			in both *eager loaded app module and feature module
+				still same behavior by merging the providers together 
+					with *one 'Root Injector' and one instance for each service
 			
+			in also *lazy loaded feature module
+				**a 'Child Injector' is create for this lazy load module
+					at the time this module is loaded
+				**a different instance of the service is created
+					and used by all elements of this module
 			
+			**so modules are loaded lazily or eagerly
+				can change number of instances of *a service in our app
+		
+		*if service is declared in 'providers' array of *'shared module'
+			**Avoid sharing this module with eager load module and lazy load module
+				**an instance of this service is added to the 'Root Injector' 
+					when application starting
+				**But another instance of this service is also added to the 'Child Injector' 
+					when lazy load feature module is added to the application
+			
+			**Do NOT provide services in shared modules
+				especially NOT, if we plan to use them in lazy loaded modules
+				
 			
 			
 			
