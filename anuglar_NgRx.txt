@@ -1,0 +1,1107 @@
+working with NgRx
+	state management
+		manage state using service
+			store application state in service
+			use service methods to change state
+		**This approach becomes difficult when application gets bigger
+			use NgRx to mangage application state
+				 NgRx is NOT part of angular
+	
+	state challenges
+		what is state
+			displays what the user see and keeps track of what the user did
+				application state
+					**lost when application refreshes
+				persistent state
+					any database
+		**keeping track of where/when the application state is edited can be difficult
+			one solution is reducing places where applciation state can be changed
+			and use *rxjs/Subject in service to inform application when state is changed
+				rxjs/Subject is basically an event emittor
+		**use Redux pattern to manage applciation state
+			store: 
+				single source of true 
+				the central place to mange application state
+			components and services: 
+				receive state from store
+			actions: 
+				dispatched by services and components to modify store
+				*actions are sent to reducers
+			reducers:
+				functions created by developer
+				takes action and potential payload as input
+				do something to it to manipulate the original state in store
+					**does NOT edit the old state, but override old state with new state
+						create new object with data copy from old object and new/edited data from action
+						
+			components/services --> actions --> reducers --> store --> components/services
+			NgRx uses Redux pattern
+			
+	working with reducers
+		install NgRx
+			npm install --save @ngrx/store
+				install the *main package of NgRx eco-system 
+		store and reducers
+			**store is provided when reducers are added
+			
+			create file for reducer under shopping-list directory
+				shopping-list.reducers.ts	
+				
+			create function with any name inside this file
+				export function shoppingListReducer(state=initial_state, action Action){}
+				**this reducer function will be triggered whenever an action is dispatched
+				
+			**function will receive two arguments which are given automatically by NgRx
+				state
+					current state of application
+					**need initial value when reducer is ran for first time
+						because there is no current state at the beginning
+				action
+					import { Action } from '@ngrx/store';
+					this is the action that will dispatched
+					
+			function will return state of applciation
+				**not editing the old state, but creating a new state
+				
+			**function will do some work *base on the action argument
+				typically uses switch statement on action type
+					switch(action.type)
+				set the value for action.type when dispatching action
+					use string to discribe the action
+				**define action.type values with constant
+					export const ADD_INGREDIENT = 'ADD_INGREDIENT'
+			
+			**by default, action in NgRx does NOT has payload
+				**need to define/extend Action class to include payload
+				
+		adding action
+			add new file for new action under shopping-list directory
+				shopping-list.actions.ts
+				
+			define new class which extends Action class
+				export class AddIngredient implements Action {}
+			
+			class has readonly type property
+				readonly type = ADD_INGREDIENT;
+				
+			class has another property which represents the payload of action
+				payload: Ingredient
+			
+			bundle all actions in this file into an alias
+				export type ShoppingListActions = AddIngredient
+				
+	registering the application store
+		add StoreModule to 'imports' array in app.module.ts
+			import { StoreModule } from '@ngrx/store';
+			imports: [ ...imports, StoreModule.forRoot({shoppingList: shoppingListReducer}) ]
+				**NgRx will set up store with initial state
+				**register shoppingListReducer as one thing that can edit the shoppingList store
+		**forRoot() registers it for the main application
+			for eagerly loaded modules *NOT for lazyly loaded modules
+		'shoppingList' is the name of store
+		'shoppingListReducer' is the name of reducer function
+		
+			
+		#-------------------Code Example: shopping-list.actions.ts-------------------
+		import { Action } from '@ngrx/store;
+		import { Ingredient } from '../shared/ingredient.model';
+		
+		export const ADD_INGREDIENT = 'ADD_INGREDIENT';
+		export const ADD_INGREDIENTS = 'ADD_INGREDIENTS';
+		export const UPDATE_INGREDIENT = 'UPDATE_INGREDIENT';
+		export const DELETE_INGREDIENT = 'DELETE_INGREDIENT';
+		export const START_EDIT = 'START_EDIT';
+		export const STOP_EDIT = 'STOP_EDIT';
+		
+		export class AddIngredient implements Action {
+			readonly type = ADD_INGREDIENT;
+			constructor(public payload: Ingredient){}
+		}
+		
+		export class AddIngredients implements Action {
+			readonly type = ADD_INGREDIENTS;
+			constructor(public payload: Ingredient[]){}
+		}
+		
+		export class UpdateIngredient implements Action {
+			readonly type = UPDATE_INGREDIENT;
+			// constructor(public payload: {index: number, ingredient: Ingredient}){}
+			constructor(public payload: {ingredient: Ingredient}){}
+		}
+		
+		export class DeleteIngredient implements Action {
+			readonly type = DELETE_INGREDIENT;
+			// constructor(public payload: number){}
+		}
+		
+		export class StartEdit implements Action {
+			readonly type = START_EDIT;
+			constructor(public payload: number){}
+		} 
+		
+		export class StopEdit implements Action {
+			readonly type = STOP_EDIT;
+		} 
+		export type ShoppingListActions = AddIngredient | AddIngredients | UpdateIngredient | DeleteIngredient | START_EDIT | STOP_EDIT;
+		
+		
+		
+		#-------------------Code Example: shopping-list.reducers.ts-------------------
+		import * as ShoppingListActions from './shopping-list.actions;
+		import { Ingredient } from '../shared/ingredient.model';
+		
+		export interface AppState {
+			shoppingList: State
+		}
+		
+		export interface State {
+			ingredients: Ingredient[];
+			editedIngredient: Ingredient;
+			eidtedIngredientIndex: number;
+		}
+		
+		const initialState: State = {
+			ingredients: [
+				new Ingredient ('Apples', 5),
+				new Ingredient ('Tomatoes', 10),
+			],
+			editedIngredient: null,
+			eidtedIngredientIndex: -1
+		};
+		
+		export function shoppingListReducer(state = initialState, action: ShoppingListActions.ShoppingListActions) {
+			switch(action.type) {
+				case ShoppingListActions.ADD_INGREDIENT:
+					return {
+						...state,
+						ingredients: [...state.ingredients, action.payload]
+					}
+				case ShoppingListActions.ADD_INGREDIENTS:
+					return {
+						...state,
+						ingredients: [...state.ingredient, ...action.payload]
+					}
+				case ShoppingListActions.UPDATE_INGREDIENTS:
+					// const ingredient = state.ingredients[action.payload.index];
+					const ingredient = state.ingredients[state.editedIngredientIndex]; 
+					const updatedIngredient ={
+						...ingredient
+						...action.payload.ingredient;
+					};
+					const ingredients = [...state.ingredients];
+					// ingredients[action.payload.index] = updatedIngredient;
+					ingredients[state.editedIngredientIndex] = updatedIngredient;
+					return {
+						...state,
+						ingredients: ingredients,
+						editedIngredient: null,
+						eidtedIngredientIndex: -1
+					};
+				case ShoppingListActions.DELETE_INGREDIENTS:
+					const oldIngredients = [...state.ingredients];
+					// oldIngredients.splice(action.payload, 1);
+					oldIngredients.splice(state.editedIngredientIndex, 1);
+					return {
+						...state,
+						ingredients: oldIngredients,
+						editedIngredient: null,
+						eidtedIngredientIndex: -1
+					};
+				case ShoppingListActions.START_EDIT:
+					const editedIngredient = {...state.ingredient[action.payload]};
+					return {
+						...state,
+						editedIngredient: editedIngredient,
+						eidtedIngredientIndex: action.payload
+					};
+				case ShoppingListActions.STOP_EDIT:
+					return {
+						...state,
+						editedIngredient: null,
+						eidtedIngredientIndex: -1
+					};
+				default:
+					return state;
+			}
+			
+		}
+					
+					
+	selecting Data from state
+		inject store into shopping-list.component.ts
+		
+			import { store } from '@ngrx/store';
+			constructor(private slService: ShoppingListService, 
+						private store: Store<{shoppingList: {ingredients: Ingredient[]}}>){}
+			
+			Store is generic type
+				need tell it the *type of data want to retrieve
+				type need to fit *global app state defined in app.module.ts file
+				
+					Store<{shoppingList: {ingredients: Ingredient[]}}>
+					
+				shoppingList is registered in app.module.ts file
+					
+					StoreModule.forRoot({shoppingList: shoppingListReducer})
+			
+		query the state
+			use select() method and specify which piece of data we are interested
+				**select() returns an observable
+				
+					shoppingListState: Observable<{ingredients: Ingredient[]}>;
+					ngOnInit(){
+						this.shoppingListState = this.store.select('shoppingList');
+					}
+				
+		**modify shopping-list.component.html to use async pipe
+			because shoppingListState is an Observable
+			
+			<ul class="list-group">
+				<a
+				class="list-group-item"
+				style="..."
+				*ngFor="let ingredient of (shoppingListState | async).ingredients; let i = index"
+				(click)="onEditItem(i)"
+				>
+					{{ ingredient.name }} ({{ ingredient.amount }})
+				</a>
+			</ul>
+			
+			
+	dispatching actions
+		
+		inject store into shopping-edit.component.ts
+		
+			import { store } from '@ngrx/store';
+			constructor(private slService: ShoppingListService, 
+						private store: Store<{shoppingList: {ingredients: Ingredient[]}}>){}
+						
+		dispatch action to add ingredient by calling dispatch()
+			
+			import * as ShoppingListActions from '../store/shopping-edit.actions';
+			const newIngredient = new Ingredient("apple", 2);
+			this.store.dispatch(new ShoppingListActions.AddIngredient(newIngredient));
+			
+		**no need to emit events to notify other components about state change
+			because the select() method returns and observable
+		**the code becomes clearner because we have NgRx manage everything through *observable
+					
+			
+	expanding app state in shopping-list.reducers.ts
+	
+		**need to store the *currently edited item in store
+			*add editedIngredient and eidtedIngredientIndex to initialState
+				**adding new properties to initialState results changes in places use *Store type
+					private store: Store<{shoppingList: {ingredients: Ingredient[]}}>
+		
+		**need to add type that represents the initialState
+			*add an interface and have initialState implements this interface
+			
+		**add another interface that represents the global app state
+			**the AppState interface is the type of data stored in the store
+				**this type is generated by this line of code in app.module.ts
+					imports: [ ...imports, StoreModule.forRoot({shoppingList: shoppingListReducer}) ]
+					
+			**this works because shoppingListReducer takes initialState as argument
+				shoppingListReducer(state = initialState, .... )
+				together with this line StoreModule.forRoot({shoppingList: shoppingListReducer})
+				generates a type { shoppingList: State }
+			
+		**still need to modify *Store type declarations but in a simpler way
+		
+			import * as fromShoppingList from '../store/shopping-list.reducers';
+			private store: Store<fromShoppingList.AppState>
+			
+
+		//---------------------------- Code Example: shopping-list.reducers.ts -------------------
+		
+				export interface AppState {
+					shoppingList: State
+				}
+				export interface State {
+					ingredients: Ingredient[];
+					editedIngredient: Ingredient;
+					eidtedIngredientIndex: number;
+				}
+			
+			
+				const initialState: State = {
+					ingredients: [
+						new Ingredient ('Apples', 5),
+						new Ingredient ('Tomatoes', 10),
+					],
+					editedIngredient: null,
+					eidtedIngredientIndex: -1
+				};
+				
+				export function shoppingListReducer(state = initialState, action: ShoppingListActions.ShoppingListActions) {
+					// function code here
+					
+				}
+				
+		//--------------------------- Code Example: shopping-edit.component.ts ------------------------------	
+				export class ShoppingEditComponent implements OnInit, OnDestroy {
+					@ViewChild('f') slForm: NgForm;
+					subscription: SubScription;
+					editMode = false;
+					editedItem: Ingredient;
+					
+					constructor(private store: Store<fromShoppingList.AppState){}
+					
+					ngOnInit(){
+						this.subscription = this.store.select('shoppingList')
+							.subscribe(
+								data => {
+									if(data.editedIngredientIndex > -1 ){
+										this.editedItem = data.editedIngredient;
+										this.editMode = true;
+										this.slForm.setValue({
+											name: this.editedItem.name,
+											amount: this.editedItem.amount										
+										})
+									}else{
+										this.editMode = false;
+									}
+								}
+							)
+					}
+					
+					ngOnDestroy(){
+						this.subscription.unsubscribe();
+						//*need to call stopEdit to set editedIngredient to null and eidtedIngredientIndex to -1
+						this.store.dispatch(new ShoppingListActions.StopEdit());
+						
+					}
+					
+					onSubmit(form: NgForm){
+						const value = form.value;
+						const newIngredient = new Ingredient(value.name, value.amount);
+						if(this.editMode){
+							this.store.dispatch(new ShoppingListActions.UpdateIngredient({ingredient: newIngredient})
+						}else{
+							this.store.dispatch(new ShoppingListActions.AddIngredient(newIngredient))
+						}
+						this.editMode = false;
+						form.reset();
+					}
+				}
+			
+			
+	Authentication and side effects
+		store auth related state in NgRx store
+		**auth has async acitons reaching out to firebase to sign in/up users
+			**async actions can NOT hangle inside reducers
+				**reducers have to return state immediately
+		
+	setting up the auth store files
+		add directory 'store' under 'auth' directory
+			add file auth.reducers.ts under 'store' directory
+			add file auth.actions.ts under 'store' directory
+		
+		add directory 'store' under 'app' directory
+			**this is the application-wide store
+			**add file app.reducers.ts under 'store' directory
+				**export a store which bundle all other states
+			**need to modify app.module.ts file to use the application-wide store
+				**add constant of type ActionReducerMap<AppState> in app.reducers.ts
+					and use this constant in app.module.ts
+						StoreModule.forRoot(reducers)
+			
+		//----------------------------auth.reducers.ts-----------------------------	
+			import * as AuthActions from './auth.actions'
+			
+			export interface State{
+				token: string;
+				authenticated: boolean;}
+			
+			const initialState: State = {
+				token: null,
+				authenticated: false};
+			
+			export function authReducer(state = initialState, action: AuthActions.AuthActions){
+				switch (action.type){
+					case (AuthActions.SIGNUP):
+					case (AuthActions.SIGNIN):
+						return{
+							...state,
+							authenticated: true
+						};
+					case (AuthActions.LOGOUT):
+						return{
+							...state,
+							token: null,
+							authenticated: false
+						};
+					case (AuthActions.SET_TOKEN):
+						return{
+							...state,
+							token: aciton.payload 
+						};
+					default:
+						return state;
+				}
+			}
+			
+			
+		//---------------------------- app.reducers.ts -----------------------------
+			import { ActionReducerMap } from '@ngrx/store';
+			
+			import * as fromShoppingList from '../shopping-list/store/shopping-list.reducers';
+			import * as fromAuth from '../auth/store/auth.reducers';
+			
+			export interface AppState{
+				shoppingListState: fromShoppingList.state,
+				auth: fromAuth.State
+				}
+			
+			export const reducers: ActionReducerMap<AppState>={
+				shoppingList: fromShoppingList.shoppingListReducer,
+				auth: fromAuth.authReducer
+			}
+			
+		//----------------------------- auth.acitons.ts-------------------------------------
+			import { Action } from '@ngrx/store';
+			
+			export const SIGNUP = 'SIGNUP';
+			export const SIGNIN = 'SIGNIN';
+			export const LOGOUT = 'LOGOUT';
+			export const SET_TOKEN = 'SET_TOKEN';
+			
+			export class Signup implements Action {
+				readonly type = SINGUP;
+			}
+			export class Signin implements Action {
+				readonly type = SINGIN;
+			}
+			export class Logout implements Action {
+				readonly type = LOGOUT;
+			}
+			export class SetToken implements Action {
+				readonly type = SET_TOKEN;	
+				constructor(public payload: string) {}
+			}
+			
+			export type AuthActions = SIGNUP | SIGNIN | LOGOUT | SET_TOKEN;
+		
+		//-----------------------------shopping-list.component.ts ---------------------------
+			import * as fromApp from '../store/app.reducers';
+			
+			constructor(private store: Store<fromApp.AppState>){}
+		
+		
+		//----------------------------- app.module.ts -------------------------------------
+			import { reducers } from './store/app.reducers';
+			
+			//use the reducer constant of type ActionReducerMap<AppState>
+			imports: [
+				...imports,
+				StoreModule.forRoot(reducers)
+			]
+		
+	using authentications
+		modify header.component.ts to use authentication
+			**store application-wide state in store 
+		
+		//--------------------------------header.component.ts -----------------------------
+			import * as fromApp from '../../store/app.reducers';
+			import * as fromAuth from '../../auth/store/app.reducers';
+			import { Observable } from 'rxjs/Observable';
+			
+			authState: Observable<fromAuth.State>;
+			
+			constructor( private store: Store<formApp.AppState> ){}
+			
+			ngOnInit(){
+				this.authState = this.store.select('auth'); 
+			}
+		
+		//--------------------------------- header.component.html ----------------------------
+			<ng-template [ngIf]="!(authState | async).authenticated">
+				<li> <a routerLink="/signup">Register</a></li>
+				<li> <a routerLink="/signin">Login</a></li>
+			</ng-template>
+		
+			<li><a
+				style="..."
+				(click)="onLogout()"
+				*ngIf="(authState | async).authenticated">Logout</a></li>
+				
+			<li class="dropdown" appDropdown *ngIf="authService.isAuthenticated()">
+				<a style="..." class="dropdown-toggle" role="button">Manage <span class="caret"></span></a>
+				<ul class="dropdown-menu">
+					<li><a style="..." (click)="onSaveDate()">Save Data<a></li>
+					<li><a style="..." (click)="onFetchDate()">Fetch Data<a></li>
+				</ul>
+			</li>
+			
+		//------------------------------------auth.service.ts ------------------------------------
+			import { Store } from '@ngrx/store';
+			import * as fromApp from '../store/app.reducers';
+			import * as AuthActions form './store/auth.actions';
+			
+			constructor( private store: Store<formApp.AppState>){}
+			
+			signupUser(email: string, password: string) {
+				firebase.auth().createUserWithEmailAndPassword(email, password)
+					.then(
+						user => {
+							this.store.dispatch(new AuthActions.Signup());
+							firebase.auth().currentUser.getToken()
+								.then(
+									(token: string) =>{
+										this.store.dispatch(new AuthActions.SetToken(token))
+									}
+								)
+						}
+					).catch(
+						error => console.log(error)
+					)
+			}
+			
+			signinUser(email: string, password: string) {
+				firebase.auth().signInWithEmailAndPassword(email, password)
+					.then(
+						response => {
+							this.store.dispatch(new AuthActions.Signin());
+							this.router.navigate(['/']);
+							firebase.auth().currentUser.getToken()
+								.then(
+									(token: string) =>{
+										this.store.dispatch(new AuthActions.SetToken(token))
+									}
+								)
+						}
+					).catch(
+						error => console.log(error)
+					)
+			}
+			
+			logout(){
+				firebase.auth().signOut();
+				this.store.dispatch(new AuthActions.Logout());
+			}
+			
+		//----------------------- auth-guard.service.ts ------------------------------------
+			import { Store } from '@ngrx/store';
+			import * as fromApp from '../store/app.reducers';
+			import * as fromAuth from './store/auth.reducers';
+			
+			constructor(private store: Store<fromApp.AppState>){}
+			
+			//**AppState has shoppingListState and auth, this is an example to select 'auth"
+			//**map execute the function and wraps return value in observable
+			//**selecting a slice of the state returns an observable
+			
+			canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+				return this.store.select('auth').map((authState: fromAuth.State) => {
+					return authState.authenticated;
+				})
+			
+			}
+			
+		//------------------------------ auth.interceptor.ts ------------------------------------
+			constructor(private store: Store<fromApp.AppState>){}
+			 
+			//**switchMap will NOT wrap the return value in an observable
+			
+			//**store.select() sets up an on going subscription 
+			//**and whenever the state changes, it will fire 
+			//**causing a new request to send with the token
+			//**that is why use take(1) here
+			
+			intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+				console.log('Intercepted!', req);
+				return this.store.select('auth')
+					.take(1)
+					.switchMap((authState: fromAuth.State) => {
+						const copiedReq = req.clone({params: req.params.set('auth', authState.token)});
+						return  next.handle(copiedReq);
+					})
+			 }
+	
+
+
+	Effects
+		side effect is something related to 
+			**dispatching action
+				**always dispatch action so that *everything is handled by NgRx
+					no need to call service class
+				*even this action may NOT change state
+			**but does NOT change store state *directly
+				*want to run other code that does NOT change the state
+					example: sending http request to sign in user
+				*could dispatch another action which change the state
+					example: update user to signin in store
+			**makes handling async tasks easy
+			
+		
+		**need to install package
+			$npm install --save @ngrx/effect
+			
+		
+		add new file under auth/store
+			auth.effects.ts
+		
+		add class in new file
+			export class AuthEffects {}
+			
+		add property inside class
+			**register the property to NgRx effects
+				decorte property with @Effect
+				
+				@Effect()
+				authSignup;
+		
+		need to access actions in store
+			inject actions with constructor
+				**NgRx effect will automatically retieve actions registered in store
+				
+			@Injectable()
+			export class AuthEffects{
+				constructor(private actions$: Actions){}	
+			}
+		
+		**register effect module in app.module.ts
+			**pass an array of all the effect classes
+				hook up to the effects module 
+					NgRx will be able to analyze our store
+						inject actions into effects class
+			
+			imports: [
+				...imports,
+				StoreModule.forRoot(reducers),
+				EffectModule.forRoot([AuthEffects])
+			]
+		
+		**watch for certain actions and take response
+			ofType() method
+				*provided by ngrx/effect
+				**evaluated for every dispatched action
+					**only continue executing if action matched 
+			
+			add new action in auth.acitons.ts
+				export const TRY_SIGNUP = 'TRY_SIGNUP';
+				export class TrySignup implements Action {
+					readonly type = TRY_SIGNUP;
+					constructor(public payload: {username: string, password: string}){};
+				}
+			
+			
+		dispatch TRY_SIGNUP action
+			*NO difference in dispatching actions
+				*still calling store.dispatch
+			
+			**because effects does NOT intend to change store's state
+				**still use same AppState, NO new property is added
+					store: Store<fromApp.AppState>
+				
+				//-------------------- signup.component.ts ---------------------
+				constructor(private store: Store<fromApp.AppState>){}
+				onSignup(form: NgForm) {
+					const email = form.value.email;
+					const password = form.value.password;
+					this.store.dispatch(new AuthActions.TrySignup({username: email, password: password}));
+				}
+				
+		handling action
+			**NOT intend to change app state
+				handling side effects that does NOT change store state
+			**this.actions$ gets access to all the actions in app
+				this.actions$ is an observable
+			**ofType() method returns Observable<Action>
+				*retieve the payload from action
+			**@Effect() decorator expects to get an observable
+				*authSignup in the end need to return an *observable
+			**fromPromise turns a promise to an observable
+				import { fromPromise } from 'rxjs/Observable/fromPromise';
+			**mergeMap merge an array of javascript objects into *observables
+				*in this case two js objects into two observables 
+				import 'rxjs/add/operator/mergeMap'
+				
+			**@Effect() will dispatch action in the end to change app state
+				**take the observable and dispatch out as action
+					*two actions dispatched because two observables return in the end
+					
+				**if do NOT want to dispatch action in the end
+					@Effect({dispatch: false})
+					and the chain does NOT return anything in the end
+			
+			@Effect()
+			authSignup = this.actions$
+				.ofType(AuthActions.TRY_SIGNUP)
+				.map((action: AuthActions.TRY_SIGNUP) => {
+					return action.payload;
+				})
+				.switchMap((authData: {username: string, password: string}) => {
+					return fromPromise(
+						firebase.auth().createUserWithEmailAndPassword(authData.username, authData.password)
+					);
+				})
+				.switchMap( ()=> {
+					return fromPromise(firebase.auth().currentUser.getIdToken());
+				})
+				.mergeMap((token: string) => {
+					return[
+						{ 
+						  type: AuthActions.SIGNUP 
+						},
+						{ type: AuthActions.SET_TOKEN,
+						  payload: token
+						}
+					];
+				});
+				
+				
+		routing within effects
+			add routing before return array of actions
+			
+				.mergeMap((token: string) => {
+					this.router.navigate(['/']);
+						return[
+							{ 
+							  type: AuthActions.SIGNUP 
+							},
+							{ type: AuthActions.SET_TOKEN,
+							  payload: token
+							}
+						];
+					});
+				import { Router } from '@angular/router'
+				constructor(private actions$: Actions, private router: Router){}
+				
+		
+		redirecting upon logout
+			**does NOT have any action after logout
+				**use @Effect({dispatch: false})
+				**use do() method to do something
+					do() return an observable in the end which is required by @Effect()
+				
+				@Effect({dispatch: false})
+				authLogout = this.actions$
+					.ofType(AuthActions.LOGOUT)
+					.do(() => {
+						this.router.navigate(['/']);
+					});
+			
+		**use NgRx state for states that span multiple components
+			**if state only affect UI or the template of component
+				**NO need to use NgRx
+				
+		keeping track of route changes
+			install ngrx package for routing
+				$npm install --save @ngrx/router-store
+			
+			add it to app.module.ts
+				import { StoreRouterConnectingModule } from '@ngrx/router-store';
+				imports:[
+					...imports,
+					StoreRouterConnectingModule
+				],
+			
+			examine application state at run time
+				install ngrx package
+					$npm install --save @ngrx/store-devtools
+				install chrome extension
+					search google for 'redux devtools chrome'
+					
+				add it to app.module.ts 
+					**make sure added after StoreModule.forRoot(reducers)
+					**configure to add it only for dev NOT for production
+						**need to have access to environment.ts file in environments folder
+							import { environment } from '../environment/environment';
+					
+						import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+						imports:[
+							...imports,
+							StoreRouterConnectingModule,
+							!environment.production ? StoreDevtoolsModule.instrument() : []
+						],
+					
+				
+	lazy load and dynamic injection			
+		recipes module and code are loaded lazily
+			loaded when the 'recipes' route is visited
+					not there at the beginning when app is started
+					
+		can NOT include recipes in the global state AppState
+			because they are not available at the beginning
+				loaded lazily
+		
+		**NgRx is able to dynamically *inject a state into global state AppState
+			if certain module/portion of our app state id loaded lazily
+			
+			create 'store' directory under recipes directory
+				create file 'recipe.reducers.ts' under 'store' directory
+				
+			define initial state
+			
+				const initialState: State = {
+					recipes: [
+						new Recipe(
+							'name',
+							'description ... ',
+							'image url ... ',
+							[ new Ingredient('meat', 1), new Ingredient('fish', 2)]
+						)
+					],
+					....
+				}
+				
+			**define interface represents the state
+				
+				export interface State {
+					recipes: Recipe[];
+				}
+				
+			**define global state for this feature
+				
+				export interface FeatureState {
+					recipes: State;
+				}
+				
+			**define reducer function *same as reducer function in other stores	
+				
+				export function recipeReducer(state = initialState, aciont: RecipeActions.RecipeActions)
+				
+			**register this reducer in global state
+				*in the recipes.module.ts file
+				*user the forFeature() method to register a feature
+					**tells NgRx to inject this reducer and its state to the global app state
+						**once component is loaded
+						
+				
+					import { StoreModule } from '@ngrx/store';
+					import {recipeReducer } from './store/recipe.reducers';
+					imports: [
+						...imports,
+						StoreModule.forFeature('recipes', recipeReducer)
+					]
+				
+				
+		adding recipe actions
+			**actions for Feature are *same as other store 
+			
+			add new file 'recipe.actions.ts' in 'store' directory
+				
+				import { Action } from '@ngrx/store';
+				export const SET_RECIPES = 'SET_RECIPES';
+				....
+				
+				export class SetRecipes implements Action {
+					readonly type = SET_RECIPES;
+					constructor( public payload: Recipe[] ){}
+				}
+				....
+		
+		
+		implementiong reducer
+			**reducer function for Feature is *same as other reducer function for store 
+			
+			export function recipeReducer(state = initialState, aciont: RecipeActions.RecipeActions){
+				switch (action.type){
+					case (RecipeActions.SET_RECIPES):
+						return {
+							...state,
+							recipes: [...action.payload]
+						};
+					case (RecipeActions.UPDATE_RECIPE):
+						const recipe = state.recipes[action.payload.index];
+						const updatedRecipe = { ...recipe, ...action.payload.updatedRecipe };
+						const recipes = [...state.recipes];
+						recipes[action.payload.index] = updatedRecipe;
+						return {
+							..state,
+							recipes: recipes
+						}
+					....
+					default:
+						return state;
+				}
+			}
+		
+		
+		dispatching and selecting state
+			**when injecting store, its type need to be global FeatureState
+				because this is how we register it in recipes.module.ts
+					StoreModule.forFeature('recipes', recipeReducer)
+				
+			**an observable<fromRecipe.State> is returned by select() method
+				**need to use *async in html file because it is observable
+				
+			in recipe-list.component.ts
+				import { Store } from '@ngrx/store'
+				import * as fromRecipe from '../store/recipe.reducers'
+				constructor( private store: Store<fromRecipe.FeatureState> ){}
+				recipeState: Observable<fromRecipe.State>;
+				ngOnInit(){
+					this.recipeState = this.store.select('recipes');
+				}
+			
+			in recipe-list.component.html
+				<div class="col-xs-12">
+					<app-recipe-item
+						*ngFor="let recipeEl of (recipeState | async).recipes; let i = index"
+						[recipe] = "recipeEl"
+						[index]="i"></app-recipe-item>
+				</div>
+				
+		
+		
+		viewing and deleting recipes
+			**need to *combine both AppState with FeatureState
+				**because store will eventually contains both
+			
+			**have FeatureState extends AppState
+				**and set store to be type Store<fromRecipe.FeatureState>
+			
+			**when responding to actions
+				**need to take the current state value in the store using select()
+				**make sure use take(1) method to prevent long term subscription
+				**then call subscribe() to process value return from observable
+					**example: onAddToShoppingList()
+				
+			in recipe.reducers.ts
+				
+				import * as fromApp from '../../store/app.reducers';
+				export interface FeatureState extends fromApp.AppState {
+					recipes: State
+				}
+				
+				
+			in recipe-detail.component.ts
+			
+				import * as fromRecipe from '../store/recipe.reducers';
+				recipeState: Observable<fromRecipe.State>;
+				constructor(....,
+							private store: Store<fromRecipe.FeatureState> ){}
+							
+				ngOnInit(){
+					this.route.params
+						.subscribe(
+							(params.Params) => {
+								this.id = + params['id'];
+								this.recipeState = this.store.select('recipes');
+							}
+						)
+				}
+				
+				OnAddToShoppingList(){
+					this.store.select('recipe')
+						.take(1)
+						.subscribe((recipeState: fromRecipe.State) => {
+							this.store.dispatch(
+								new ShoppingListActions.AddIngredients(
+									recipeState.recipes[this.id].ingredients
+								)
+							);
+						});
+				}
+			
+			in recipe-detail.component.html
+				<img
+					[src]="(recipeState | async).recipes[id].imagePath"
+					alt="{{(recipeState | async).recipes[id].name}}"
+					class="image-responsive"
+					style="...">
+		
+		
+	recipes side effects - fetching from server
+		there are side effects that call firebase in data-storage.service.ts 
+			calls getRecipes() and store the result into firebase
+			calls setRecipes(recipes) after fetching data from firebase
+			
+		**withLatestFrom(this.store.select('recipes')) combines two observable into one
+			**combines observable return from ofType
+			**with observable return from this.store.select('recipes')
+			import 'rxjs/add/operator/withLatestFrom';
+		
+		**@Effect({dispatch: false}) if we do NOT want to perform farther actions
+		
+		add recipe.effects.ts file in 'store' directory
+			import {Actions, Effect } from '@ngrx/effects';
+			
+			export class RecipeEffects {
+				@Effect()
+				recipeFetch = this.acions$
+					.ofType(RecipeActions.FETCH_RECIPES)
+					.switchMap((action: RecipeActions.FETCH_RECIPES) => {
+						return this.httpClient.get<Recipe[]>(
+							'https://firebase_link_here/recipes.json',
+							{
+							observe: 'body',
+							responseType: 'json'
+							}
+						)
+					})
+					.map(
+						(recipes) => {
+							console.log(recipes);
+							for (let recipe for recipes){
+								if (!recipe['ingredients']){
+									recipe['ingredients'] = [];
+								}
+							}
+							return {
+								type: RecipeActions.SET_RECIPES,
+								payload: recipes
+							};
+						}
+					);
+					
+					
+				@Effect({dispatch: false})
+				recipeStore = this.actions$
+					.ofType(RecipeActions.STORE_RECIPES)
+					.withLatestFrom(this.store.select('recipes'))
+					.switchMap(([action, state]) => {
+						const req = new HttpRequest( 
+							'PUT', 
+							'https://firebase_link_here/recipes.json', 
+							state.recipes, 
+							{reportProgress: true}
+							)
+						return this.httpClient.request(req);
+					
+					});
+					
+					
+				constructor(private actions$: Action){}
+			}
+			
+		
+			
+		register this effects in recipes.module.ts file
+		
+			import { EffectsModule } from '@ngrx/effects';
+			import { RecipeEffects } from './store/recipe.effects';
+			imports: [
+				...imports,
+				EffectsModule.forFeature([RecipeEffects])
+			]
+		
+		add actions to recipe.actions.ts file
+			
+			export const STORE_RECIPES = 'STORE_RECIPES'
+			export const FETCH_RECIPES = 'FETCH_RECIPES'
+			
+			export class StoreRecipes implements Action {
+				readonly type = STORE_RECIPES;
+				//Not payload is needed, recipes are in store
+			}
+			
+			export class FetchRecipes implements Action {
+				readonly type = FETCH_RECIPES;
+				//Not payload is needed, recipes are in store
+			}
+			
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

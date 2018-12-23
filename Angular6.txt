@@ -1,3 +1,6 @@
+create new project
+	ng new <project-name>
+
 start angular server in cmd:
 	$ng serve
 
@@ -55,7 +58,7 @@ components
 				ts class decorator telling angular that this class is a component
 				{} contains meta data telling angular what to do with this ts class
 			"import {Component} from '@angular/core';"
-				need to import component feature form angular
+				need to import component feature from angular
 		generating component from cli
 			generated under app directory
 				$ng g c recipes --spec false
@@ -197,17 +200,17 @@ Component communication
 		
 		exposing component property of child component to other component
 			use @Input() decorator on property
-				@input() element: {type: string, name: string, content: string};
+				@Input() element: {type: string, name: string, content: string};
 				import{Input} from '@angular/core';
 			alias to property name
-				@input("svrElement") element: {type: string, name: string, content: string};
+				@Input("svrElement") element: {type: string, name: string, content: string};
 					use svrElement in template for element property
 	event binding on component
 		create property as EventEmitter in *child component
 			@Output() serverAdded = new EventEmitter<{newServerName: string, newServerContent: string}>();
 			
 		exposing this property using @Output
-			import{Input} from '@angular/core';
+			import{Output} from '@angular/core';
 		
 		calling emit() to send data to parent component
 			this.serverAdded.emit({newServerName: this.newServerName, newServerContent: this.newServerContent});
