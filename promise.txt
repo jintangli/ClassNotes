@@ -1,0 +1,31 @@
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
+	
+
+syntax
+	new Promise( /* executor */ function(resolve, reject) { ... } );
+		 **The executor function is executed immediately by the Promise implementation 
+			passing resolve and reject *functions
+			**executor is called before the Promise constructor even returns the created object
+			executor normally initiates some *asynchronous work
+			
+description
+	a promise 
+		is a proxy for a value not necessarily known when the promise is created
+		allows you to associate handlers with an asynchronous action's eventual success or failure
+			this lets *asynchronous methods return values like synchronous methods
+			instead of immediately returning the final value, 
+				the asynchronous method returns a promise to supply the value at some point in the future
+				
+	a promise is in one of these states:
+		pending: 
+			initial state, neither fulfilled nor rejected.
+		fulfilled: 
+			meaning that the operation completed successfully.
+		rejected: 
+			meaning that the operation failed.
+			
+	**if the promise has already been fulfilled or rejected when a corresponding handler is attached, 
+		**the handler will be called
+		**there is no race condition between an asynchronous operation completing and its handlers being attached
+		
+	

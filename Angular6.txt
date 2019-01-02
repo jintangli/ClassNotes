@@ -256,7 +256,7 @@ directives
 				[ngStyle]="{background-color: odd % 2 !== 0 ? 'yellow' : 'transparent'}"
 		**only affect/change the element they are added to
 		
-	sttructural Directives
+	structural Directives
 		look like a normal html attribute but have a leadding *
 			*ngIf
 			*ngFor
@@ -284,7 +284,7 @@ directives
 		add elementRef to the constructor
 			reference to the element this directive will be placed
 			**inject the element the directive sits on into this directive
-					constructor(private elementRef: ElementRef){}
+				constructor(private elementRef: ElementRef){}
 			**private makes this elementRef accessible everywhere in the class
 				make it became a property of this class
 				
@@ -410,9 +410,10 @@ directives
 routing
 	
 	setting up and loading routes
-		**regestering routes in app.module.ts
-			add constant appRoutes that holds all routes in our app
-			**each route is an instance of Routes
+		**registering routes in app.module.ts
+			**define all routes in our app
+			constant appRoutes is an instance of Routes
+			
 				import { Routes } from "@angular/router";
 				const appRoutes: Routes = [ 
 					{path: '', component: HomeComponent},
@@ -420,8 +421,9 @@ routing
 					{path: 'servers', component: ServersComponent},
 					];
 		
-			**add RouterModule to imports array to app.module.ts
+			**register all routes to app.module.ts with RouterModule 
 			forRoot register routes for *main application
+			
 				import { Routes } from "@angular/router";
 				imports: [
 					...imports,
@@ -430,16 +432,17 @@ routing
 			
 			**inform angular *where to display the component template when route is selected
 				**add router-outlet *directive to app.component.html
+				
 					<div class="row">
 						<div class="col-xs-12 col-sm-10 col-md-8">
 							<router-outlet> </router-outlet>
 						</div>
 					</div>
 
-	navigating with router links
+	navigating with router links in *template
 		add links to template
 			**do NOT use *href for links
-				**it will cause app to reload, app state will be lost
+				**it will cause app to *reload, app *state will be lost
 			
 			**use routerLink which will NOT reload page
 				routerLink catches the click on element 
@@ -480,7 +483,7 @@ routing
 				</li>
 
 				
-	navigating programmatically
+	navigating programmatically in *ts file
 		load route programmatically in ts files
 			**need to have access to the router
 				**inject router in component constructor
@@ -512,8 +515,8 @@ routing
 		**add parameters to route to encode data in path
 			**parameters are the dynamic segments in path
 				put *colon in front of parameters
-					to get single user with id
-					
+				
+					// to get single user with id
 					const appRoutes: Routes = [
 						{ path: 'users/:id', component: UserComponent },
 					]
@@ -591,8 +594,8 @@ routing
 						
 			
 			**user should make sure that subscription is destroyed when component is destroyed
-				component is destroyed when user leave the page
-				component is re-created when user come back to page
+				**component is destroyed when user leave the page
+				**component is re-created when user come back to page
 				**if subscription is not destroyed when component is destroyed
 					there will be memory leak
 					
@@ -606,11 +609,11 @@ routing
 	passing query parameters and fragments
 		query parameters start with ? and separated with &
 			localhost:4200/users/10/Anna?mode=editing&active=true
-		fragmetns start with # to jump to specific place in application
+		fragments start with # to jump to specific place in application
 			localhost:4200/users/10/Anna?mode=editing&active=true#loading
 			
 		**use queryParams *property of routerLink *directive to set query parameters
-		**use fragment *property of routerLink *directive to see fragment
+		**use fragment    *property of routerLink *directive to set fragment
 			**there may only be one fragment
 			
 			new route in app.module.ts
@@ -621,7 +624,7 @@ routing
 				in servers.component.html template file
 					
 					<a
-						[routerLink]="['/servers', server.id]"
+						[routerLink]="['/servers', server.id, 'edit']"
 						[queryParams]="{allowEdit: server.id ===3 ? '1': '0'}"
 						[fragment]="'loading'"
 						class="list-group-item"
@@ -724,7 +727,7 @@ routing
 					{path: 'servers',
 					 component: ServersComponent, 
 					 children:[
-							{path: ':id',      component: ServerComponent},
+							{path: ':id',       component: ServerComponent},
 							{path: ':id/edit',  component: EditServerComponent},	
 						]
 					},
@@ -749,7 +752,7 @@ routing
 	redirecting and wild card	
 		**handle paths NOT defined in our route
 			"localhost:4200/something-random" will result an error
-		**need to redirect user to default page when user try to visit page we do NOT have
+		**need to redirect user to default page when user try to visit page does NOT exist
 			generate new component page-not-found.component
 			add route to the *end of our routes 
 				**angular matches routes from top to bottom and use the first one that matches
@@ -768,10 +771,12 @@ routing
 			]
 		
 	outsourcing the route configuration
-		in app.module.ts, remove RouterModule.forRoot(appRoutes) from imports array
+		remove RouterModule.forRoot(appRoutes) from imports array in app.module.ts
 		add new *module file app-routing.module.ts
 			decorate the class definition with @NgModule()
-			add imports array with RouterModule.forRoot(appRoutes) to @NgModule
+			**add imports array with RouterModule.forRoot(appRoutes) to @NgModule
+			**add exports array to @NgModule
+				**in exports array, define what should be accessible to module that import this module
 				
 				const appRoutes: Routes = [ 
 					// all path configurations here
@@ -785,13 +790,10 @@ routing
 				)
 				export class AppRoutingModule{}
 		
-		**add AppRoutingModule back to appModule
-			**add exports array into NgModule decorator
-				**in exports array, define what should be accessible to module that import this module
-				
-		**in appModule, import AppRoutingModule in the imports array
-			import { AppRoutingModule } from './app-routing.module';
-			imports: [ ...imports, AppRoutingModule ]
+		**add AppRoutingModule back to appModule		
+			**in appModule, import AppRoutingModule in the imports array
+				import { AppRoutingModule } from './app-routing.module';
+				imports: [ ...imports, AppRoutingModule ]
 			
 	
 	**protecting routes with guards
@@ -810,7 +812,7 @@ routing
 						boolean
 					**canActivate can run async or sync
 				**Angular will execute this code before the route is loaded
-					so angular will	pass in this arguments
+					so angular will	pass in these arguments
 				
 				canActivate() calls the AuthService for user authentication
 					**need to add @Injectable declarator
@@ -881,7 +883,7 @@ routing
 				}
 				
 				canActivateChild(route: ActivatedRouteSnapshot,
-							state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
+							     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
 					return this.canActivate(route, state)		
 				}
 			}
@@ -986,20 +988,20 @@ Services
 	what are services
 		place for centralizing code
 			logging
-			data storage
+			*data storage
 			
 	create logging service
-		create a file and class inside this file
+		create a file and a class inside this file
 			logging.service.ts
 		service is normal typescript class
 			**no class decorator is needed
-		do NOT create service instances manually
-			angular provides dependancy injector 
+		**do NOT create service instances manually
+			**angular provides dependancy injector 
 				*better way to access service by having service stay in angular's ecosystem
 	
 	injecting service into *components
 		hierarchical injector
-			inject dependancy instances into our class automatically
+			injects dependancy instances into our class automatically
 		**need to inform angular about dependancy on service
 			*use constructor()
 				constructor(private loggingService: LoggingService){}
@@ -1026,7 +1028,7 @@ Services
 				this.accountsService.addAccount(accountName, accountStatus); }
 		add AccountsService to AccountComponent
 			@Component({providers:[AccountService]})
-				**should NOT put it in hte providers array
+				**should NOT put it in the providers array
 				**Angular will create a new AccountService instance and override the one from AppComponent
 			constructor(private accountsService: AccountsService){}
 			onSetTo(status: string){
@@ -1088,25 +1090,26 @@ Forms
 	**Angular offers two ways handling forms
 		template driven
 			form set up in template
-			angular infers the form object from the DOM
+			angular *infers the form object from the DOM
 		reactive
-			form is created programmatically and synchronized with the DOM
+			form is created programmatically and *synchronized with the DOM
 	
 	template driven
 		**everything done to form happens in template
+		
 		<form> element has no 'action' and 'method' attribute
-			because form should not be submitted to server
+			because form should NOT be submitted to server
 			
 		add 'FormsModule' to imports:[] in app.module.ts
 			angular will generate form object when it sees <form> element in template file
 				**need register controls manually
-					add 'ngModel' and 'name' to <input> element
+					add ngModel *directive and name to <input> element
 						<input ngModel name="username">
 		
 		submitting form
-			add 'ngSubmit' *directive to <form> element
+			add ngSubmit *directive to <form> element
 				<form (ngSubmit)="onSubmit()">
-			add '#f' reference to <form> element to get access to form created by angular
+			add #f reference to <form> element to get access to form created by angular
 				<form (ngSubmit)="onSubmit(f)" #f="ngForm">
 				onSubmit(form: ngForm){...}
 		
@@ -1119,23 +1122,33 @@ Forms
 				
 		accessing form with @ViewChild
 			**allow user to access form before it is submitted
+			
 				@ViewChild('f') signupForm: NgForm;
-				onSubmit(){ console.log(this.signupForm); }
+				onSubmit() {
+					this.submitted = true;
+					this.user.username = this.signupForm.value.userData.username;
+					this.user.email = this.signupForm.value.userData.email;
+					this.user.secretQuestion = this.signupForm.value.secret;
+					this.user.answer = this.signupForm.value.questionAnswer;
+					this.user.gender = this.signupForm.value.gender;
+
+					this.signupForm.reset();
+				}
 				
 		adding validation to check user input
 			Not empty input
-				add 'required' *directive to <input> element
+				add required *directive to <input> element
 					<input ngModel name="username" required>
 			email input
-				add 'email' *directive to <input> element
+				add email    *directive to <input> element
 					<input ngModel name="email" required email>
 		
 		using the form state
-			*angular checks the state of each control
+			**angular checks the *state of each control
 				and condictionally adds the correponding *css class
 			disable submit button if form is not valid using *property binding
 				<button type="submit" [disabled]="!f.valid">
-			use ng-invalid css class to highlight invlid form input field
+			use ng-invalid css class to highlight invalid form input field
 				input.ng-invalid.ng-touched { border: 1px solid red; }
 				
 		outputting validation error message
@@ -1146,6 +1159,9 @@ Forms
 			
 		set default value with ngModel property binding
 			**add ngModel to element with property binding
+				**ngModel knows the element type and take set default value for that element type
+					select element's default value is one of the option
+				
 				<select [ngModel]="defaultQuestion" name="secret">
 					<option value="pet"> your first Pet? </option>
 				in ts class
@@ -1153,6 +1169,9 @@ Forms
 		
 		use ngModel for two-way-binding
 			**will still have the default input value when use ngModel with two-way-binding
+				**ngModel knows the element type and set default value for that element type
+					textarea element's default value is a string
+				
 				<textarea name="questionAnswer" [(ngModel)]="answer"> </textarea>
 				<p> Your reply: {{answer}}</p>
 			
@@ -1167,16 +1186,30 @@ Forms
 					
 		handling radio buttons
 			add ngModel to each input of radio type
-				<input type="radio" name="gender" ngModel [value]="gender" required>
-					
+			
+				<div class="radio" *ngFor="let gender of genders">
+					<input type="radio" name="gender" ngModel [value]="gender" required> {{gender}}
+				</div>	
+				
 		setting and patching form values
 			@ViewChild('f') signupForm: NgForm;
 			use setValue()which sets all values of the form
-				this.signupForm.setValue({ value for each form input here })
+				setValue() set all value of form
+			
+				this.signupForm.setValue({
+				   userData: {
+				     username: suggestedName,
+				     email: ''
+				   },
+				   secret: 'pet',
+				   questionAnswer: '',
+				   gender: 'male'
+				})
+				
 			better approach is to set only single input value of form
 				patchValue() override single value of form
-				setValue() set all value of form
-				this.signupForm.form.patchValue({ userData: { username: suggestedName} });
+				
+					this.signupForm.form.patchValue({ userData: { username: suggestedName} });
 				
 		using form data
 			onSubmit(){
