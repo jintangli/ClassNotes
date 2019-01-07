@@ -1159,8 +1159,8 @@ Forms
 			
 		set default value with ngModel property binding
 			**add ngModel to element with property binding
-				**ngModel knows the element type and take set default value for that element type
-					select element's default value is one of the option
+				**ngModel knows the element type and set default value for that element type
+					select element's default value is one of its option
 				
 				<select [ngModel]="defaultQuestion" name="secret">
 					<option value="pet"> your first Pet? </option>

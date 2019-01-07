@@ -1,0 +1,479 @@
+
+find system date
+	current month
+		$cal
+	some other month
+		$cal 7 2002
+	current date
+		$date
+	view date in custom format
+		$date '+DATE:%m-%y%nTIME:%H:%M:%S'
+			DATE and Time: string to display
+			%m: month
+			%y: year
+			%n: new line
+			%H: hour
+			%M: month
+			%S: second
+
+
+
+create files and directories
+	create empty files
+		$touch <file1> <file2> <file3>
+	
+	create new directory
+		$mkdir <directory name>
+	
+	create text files
+		$cat > test
+		enter text into this file
+		**press ctrl + d to save and exit
+	
+	view text file
+		$cat < test
+
+	merge two files
+		$cat <file1> <file2> > <outputfile>
+	
+	
+		
+rename, delete files and directories
+	rename file
+		$mv <old_name> <new_name>
+	
+	remove file
+		$rm <file_name>
+	
+	remove directory
+		$rm -r <directory name>
+		$rmdir <directory name>
+
+
+copy, link to files and directories
+	copy file
+		$cp <origin_file> <copy_file>
+	
+	link to file: any modification in <old_file> will be reflected in <new_file>
+		
+		hard link:<new_file> remains there when <old_file> is deleted	
+			$ln <old_file> <new_file>
+				
+		softlink:<new_file> causes error when <old_file> is deleted
+			$ln -s <old_file> <new_file>
+
+	
+
+file permissions
+	category:
+		owner|group|other
+	
+	permission:
+		read: 4
+		write: 2
+		execute: 1
+	
+	default settings:
+		owner: read and write
+		group: read
+		other: read
+		
+	default is control by umask
+		$umask
+		-> 0022
+	
+	default setting = 0666 - $umask
+
+
+view file properties
+	view file permission
+		$ls -l
+	
+	view hidden file
+		$ls -a
+	
+	
+
+change file permissions
+	change permission to 777
+		$chmod 777 <file_name>
+			
+	**must have *execute permission to a directory
+		which allows user to click and open directory
+
+	find out kernel and machine names and other info
+		$uname -a
+
+
+file and wc command
+	file display all files with file types in current directory
+		$file *
+	
+	wc return number of lines, worlds, charactors and file name in a file
+		$wc -l -w -c <file_name>
+
+
+12. sort command
+	sorts *lines in alphabetical order and print out on screen *without changing file
+		$sort <file_name>
+		
+13. cut command
+	cut filters file and display only certain fields
+		$cut -d "-" -f 1,3 <file_name>
+		-d for delimitor
+		-f for fields
+		example:
+			kobe Bryant-basketball-30 -> kobe Bryant-30
+
+14. dd command
+	dd convert and copy fils
+		input file intact, output file all UPPER CASE
+			$dd if=<input_file> of=<output_file> conv=ucase
+		
+15. man, banner compress
+	man finds out the usage about a command
+		$man cat
+	
+	banner generates fancy text on console
+		space triggers newline
+			$banner Hello World
+		
+		quotation mark puts all world in one line, *no more than 10 charactors
+			$banner "Hello World"
+	
+	compress zips a file
+		$compress -v <file_name>
+		
+	zcat views zipped files
+		$zcat <compressed_file_name>
+		
+	uncompress unzips a file
+		$uncompress <compressed_file_name>
+		
+16. scripting
+	commands in scripting file are excuted *in the order they are specified
+		comments start with #
+		echo displays string on console
+			
+			#This is command
+			echo "Hello World"
+			
+	execute file use sh
+		$sh <file_name>.sh
+	
+17. more scripting example
+		
+		#This is second file on scripting
+		pwd
+		ls -l
+		banner "The End"
+	
+18. shell variables, user input
+		
+		*variable name can contain letter, number and _
+		*variable name starts with letter or _
+		*variable name are case sensitive
+		*put $ in front of variable name to access variable value
+		**NO space around = when assigning value to variable
+		**shell stores all value into variable as *String
+		
+		*read waits for user input and assigns this input to a variable
+		
+			#use variable and read
+			echo "please enter your name"
+			read my_name
+			echo "Hello $my_name, nice to see you"
+		
+19. positional parameters
+		positional variables hold anything that follows script name
+			$1 first word after script name
+			$2 second word after script name
+			...
+			
+		positional variables are system variables
+			##in ss4.sh file
+			#This file takes a file name as input and renames it
+			mv $1 $2
+			cat $2
+			
+			##to run file
+				$ssh ss4.sh <old_file_name> <new_file_name>
+
+20. more on positional parameters
+		setting positional variables in command line
+			$set shell scripting is good
+			$echo $1 
+				-> shell
+			$echo $2
+				-> scripting
+			...
+		
+		viewing all positional variables
+			#echo $*
+			
+		
+21. reverse quotes
+		**reverse quotes sets the execution precidence
+		**statements inside `` run first
+			$echo `expr 1 + 2`
+				-> 3
+		
+			##in ss6.sh
+			#Rename a file to file.name
+			#where name is the login name of the user executing the script
+			name=$1
+			set `who am i`
+			mv $name $name.$1
+			
+22. find number of positional variables
+		$# contains the number of positional variable set
+			$set my name is Jin
+			$echo $#
+				-> 4
+			
+		
+23. math operations 
+	
+		* means every files/directories in current directories
+			escape it to use it for multiplication, 
+				1 \* 2
+		
+		*use expr for instructing shell to do math operations
+			**expr only deal with *integers
+			
+				##in ss8.sh
+				#Arithmetic operations
+				a=30 b=15
+				echo `expr $a + $b`
+				echo `expr $a - $b`
+				echo `expr $a \* $b`
+				echo `expr $a / $b`
+				echo `expr $a % $b`
+				
+24. more on expr
+		*need to escape parentheses
+		*need to put space around each symbol
+		
+			##in ss8.sh file
+			#Arithmetic operations
+			a=30 b=15 c=2 d=5
+			echo `expr $a \* \( $b + $a \) / $d`
+			
+25. floating arithmetic
+		use bc for floating number operations
+		bc is different from expr, bc takes input from echo
+		
+			##in ss9.sh file
+			#floating point arithmetic
+			a=10.5
+			b=3.5
+			c=`echo $a + $b | bc`
+			d=`echo $a - $b | bc`
+			e=`echo $a \* $b | bc`
+			c=`echo $a / $b | bc`
+			echo $c $d $e $fancy
+			
+26. escape sequences
+		use \n for new line
+		use \t for tag space
+		use \b for backward one space
+		use \033[1m to set bold mode
+		use \033[0m to exit bold mode
+		use \033[7m black background and white font
+		
+27. tput
+		use tput to control where output should be display in console
+			
+			##in ss11.sh file
+			#print in bold the next line start in 15 row 20 col
+			tput cup 15 20
+			tput bold
+			echo "This should be in bold"
+			echo "\033[0m"
+			
+28. if, then
+29. if, then, else
+		$? is the exit status of any command
+			$echo $?
+				0 = successful
+				1 = fail
+		
+		## in if-then.sh file
+		#if-then statement in action
+		echo "Enter source and target file names"
+		read source target
+		if mv $source $target
+		then
+		echo "your file has been successfully renamed."
+		else
+		echo "the file could not be renamed."
+		fi
+		
+		$touch test
+		$sh if-then.sh
+		Enter source and target file names.
+		test sample
+		your file has been successfully renamed.
+		
+		**read can take more than one argument
+			assign one *word to one argument
+			
+		**mv $source $target will return 0 if successfully executed
+			*meaning 0 is evaluated as *true
+			
+		**fi marks the end of the if block
+		
+		
+30. run check on number
+	**must surround [ and ] with space when doing number check
+		-lt = less than
+		-gt = greater than
+		-eq = equal
+		-le = less than equal to
+	
+	**elif also has *then
+	
+		##in test.sh file
+		echo "Enter a number between 10 and 20 :\c"
+		read num
+		if [ $num -lt 10 ]
+		then
+			echo "That was under the belt partner."
+		elif [ $num -gt 20 ]
+		then
+			echo "that went over my head."
+		else
+			echo "now you are making sense!"
+		fi
+		
+		
+31. run check on files
+	**use -f to check if file exist
+		[ -f $fileName ]
+	
+	**use -d to check if directory exist
+		[ -d $directoryName ]
+		
+	**use -b to check if file is block/image file
+		[ -b $fileName ]
+		
+	**use -r, -w, -x for checking read, write, execute permission
+	
+	**use -s to check if file size is *greater than *0
+
+	
+		##in file-test.sh file
+		echo "enter an name:\c"
+		read fname
+		if [ -f $fname ]
+		then
+			echo "you indeed entered a file name."
+		else
+			echo "Not a file name."
+		fi
+		
+
+32. append text to a file
+		**use cat >> <file_name> to append content to file
+		
+		**use -w to remove write permission from owner
+			$chmod -w <file_name>
+			
+		**use +w to git write permission to owner
+			$chmod +w <file_name>
+			
+		##in append.sh file
+		echo "Enter file name:\c"
+		read fname
+		if [ -f $fname ]
+		then
+			if [ -w $fname ]
+			then
+				echo "Type matter to append, press ctr+d to quit"
+				cat >> $fname
+			else
+				echo "you do not have permission to write"
+			fi
+		fi
+		
+	
+33. run check on strings
+		**surround string variables with "" to retrieve its value
+		**check if two strings are equal using = with spaces surround it
+		**check if string is NOT empty using -n
+		**check if string is empty using -z
+		**initialize empty string
+			str3= or str3=""
+			
+		##in string-test.sh file
+		#string check
+		str1="hey you"
+		str2="what's up?"
+		str3=""
+		
+		[ "$str1" = "$str2" ]
+		echo $?
+		
+		[ "$str1" != "$str2" ]
+		echo $?
+		
+		[ -n "$str1" ]
+		echo $?
+		
+		[ -z "$str3" ]
+		echo $?
+		
+
+34. the AND logical operator
+	
+		**use -a for and
+		
+		##in and.sh file
+		echo "enter a number between 50 and 100:\c"
+		read num
+		if [ $num -le 100 -a $num -ge 50 ]
+		then
+			echo "You are within the limits."
+		else
+			echo "You are out of limits."
+		fi
+		
+
+35. count the number of characters in user input
+	
+		**read includes the carriage return as one char 
+			because always need to press enter key in the end to get cursor background
+		
+		**use echo and | to send content in var into wc
+
+		
+		##in count.sh file
+		echo "Enter a character"
+		read var
+		if [ `echo $var | wc -c` -eq 2 ]
+		then
+			echo "You entered a character."
+		else
+			echo "invalid input."
+		fi
+			
+			
+			
+			
+	
+	
+		
+	
+		
+	
+		
+			
+	
+	
+
+
+
+
+
+
+
