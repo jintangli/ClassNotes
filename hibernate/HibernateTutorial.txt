@@ -1,0 +1,1310 @@
+01. intro to Hibernate:
+	Hibernate is an ORM tool: Object to Relational Mapping
+		need to convert each object to a sql query to persist into database
+		need to retrieve data from database and create object with this data
+		each class corresponds to a table in the database
+		each object of the class corresponds to a row in the table
+		each field of the object corresponds to a column in the table
+		
+	Implements JPA: Java Persistance API
+		
+	Problem
+		mapping member variables to columns: adding/removing fields <--> adding/removing columns
+		mapping relationships: object refers to another object <--> table refers to another table using foreign key
+		handling data types: database does not have certain data types 
+		Managing changes to object state: calling update queries
+		
+		
+		
+02. setting up Hibernate: *each version of hibernate has different settings, refer to its online manual*
+	Download Hibernate
+		downlaod all the jar files and add them into class path: all the classes in the required folder + one class from jpa folder
+	
+	Download eclipse
+	
+	Start new project in eclipse
+		create new java project
+		include all the required jars for hibernate: in the java build path, add jars to the libraries
+			create a new user library for all the hibernate jars
+			add jdbc driver for connecting to the database: add external jar to the build path libraries
+				use jdbc driver for MySql
+		
+	Install database: MySql
+	
+	
+		
+03. writing a Hibernate Application: saving an object to database
+	saving without Hibernate
+		JDBC database configuration: connecting to a particular database
+		The Model object: the object need to save
+		Service method to create the model object
+		Database Design: tables for the classes
+		DAO method to save the object using sql queries
+		
+	The Hibernate
+		JDBC database configuration: Hibernate configuration - and xml configuration files
+		The Model object: Annotations
+		Service method to create the modle object - Use the Hibernate API
+		Database design is NOT needed: as long as the Model objects are created correctly, hibernate will generate the table
+		
+	Creating the hibernate configuration file: hibernate.cfg.xml *search online for setting up this file for particular database*
+		default name for Hibernate configuration: Hibernate will search this file and looks up the configuration inside
+		save this file in src folder of project
+		provide the database connection settings
+		set the sql-dialect *this info corresponds to a class in the jar we imported in the previous step, look for this class in the libraries *
+		
+04. writing the Model class with Annotations
+	Continue configuring the hibernate.cfg.xml file
+		hbm2ddl.auto property: create/update
+			create will drop and re-create the database schema on start up 
+			update will NOT re-create the schema
+		
+		Every model class that is an annotated entity will need to add as a mapping element in this file
+			example: <mapping class="com.overcommer.frcc.dto.UserDetails" />
+	
+	Add a model class with annotation: UderDetails 
+	
+		@Entity
+		public class UserDetails{
+			
+			@Id
+			private int userId;
+			private String userName;
+			
+			public int getUserId(){
+				return userId;
+			}
+			
+			public void setUserId(int userId){
+				this.userId = userId;
+			}
+			
+			public String getUserName(){
+				return userName;
+			}
+			
+			public void setUserName(String userName){
+				this.userName = userName;
+			}
+		
+		}
+		
+		This class need to be added as <mapping /> element in the hibernate.cfg.xml
+		
+		@Entity : javax.persistence.Entity
+			need to be on top of the class name
+			tells hibernate to treat this class as entity 
+			tells hibernate to save it to database
+			
+		
+		@Id: javax.persistence.Id
+			need to be on top of a field name
+			tells hibernate that this field will be a PRIMARY KEY 
+			
+		These two annotations: @Entity & @Id are mandatory. 
+		
+
+05. Saving Objects using Hibernate APIs
+
+	Create Session Factory: one object per application 
+		it is created out the the configuration file
+		it creates sessions
+		
+	Create a session from the session factory
+		create a session everytime we want to use the database
+	
+	Use the session to save model objects
+	
+		
+	Create a Test class with main method
+		public class HibernateTest {
+
+			public static void main(String[] args) {
+				UserDetails user = new UserDetails(); 
+				
+				user.setUserId(2);
+				user.setFirstName("Sen");
+				user.setLastName("Li");
+				
+				StandardServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure( "hibernate.cfg.xml" ).build();
+				Metadata metadata = new MetadataSources( standardRegistry ).getMetadataBuilder().build();
+				SessionFactory sessionFactory = metadata.getSessionFactoryBuilder().build();
+
+				Session session = sessionFactory.openSession();
+					
+				session.beginTransaction();
+				session.save(user);
+				session.getTransaction().commit();
+				
+			}
+
+		}
+		
+06. hbm2ddl Configuration and Name Annotations
+
+	Setting hbm2ddl.auto property in hibernate.cfg.xml
+		<property name="hbm2ddl.auto">create</property>
+		setting it to create will have hibernate drop and re-create the schema every time the application is started
+		this happens at the time when sessionFactory is created
+		the way hibernate does this is by looking into all the model classes
+		
+		<property name="hbm2ddl.auto">update</property>
+		retain data from the previous run
+		it will create new table for a class if this class is modified
+		
+	Setting Entity name for class: using the same name for both Entity name and table name
+		@Entity (name="USER_DETAILS")
+		public class UserDetails{
+			//class details here
+		}
+		
+	Setting the column name for a class field
+		@Column (name="USER_NAME")
+		private String userName;
+		
+		@Id
+		@Column (name="USER_ID")
+		private int userId;
+		
+		*putting the annotation on top of field name will cause hibernate to use field values when saving data into table*
+		
+	Putting the annotations on top of the getters will have the same effect
+		@Column (name="USER_NAME")
+		public String getUserName(){
+			return userName + "from getter"; //make the value return from getter different from field value
+		}
+		
+		@Id
+		@Column (name="USER_ID")
+		public int getUserId(){
+			return userId;
+		}
+		
+		*putting the annotations on top of getters will cause hibernate to use values from getters when saving data into table*
+		*only will work after we put annotation on top of the getter for the PRIMARY KEY, then it will ignore all the annotation on top of field*
+
+07. more Annotations
+	Setting only the table name but NOT the the Entity name
+		@Entity
+		@Table(name="USER_DETAILS")
+		public class UserDetails{
+			//class details here
+		}
+	
+	Telling hibernate to ignore a field of a class: not to store this field as a column of table
+		public class UserDetials{
+			@Transient
+			private String userName; // userName will not be stored in the table
+		
+		}
+		
+		Setting the field static is another way to have the same effect
+			If every object of a class has the same value for that field, a static field, make no sense to store this field into a table
+		
+	Treating the field as it is and apply all the hibernate defaults
+		If no annotation is added for a field, hibernate will automatically assume this field need to be saved.
+		
+		Using @basic without specifying any properties will be as good as without using it
+		public class UserDetials{
+			@Basic
+			private String userName; 
+		
+		}
+		
+	Handling Date types	
+		
+		public class UserDetials{
+			@Temporal (TemporalType.DATE)
+			private Date joinedDate; //only the date value 01-11-2016 will be stored in the table, not a time stamp 01-11-2016 13:01:17.159 
+		
+		}
+		
+	Storing large objects into table, Lob stand for Large object.
+		 
+		If the value need to store into database is big, and don't know how big it could be ahead of time.
+		Lob tells hibernate to choose character Lob (Clob) or binary stream Lob (Blob)
+		public class UserDetials{
+			@Lob
+			private String description; //if description is really big, more than the default 255 varchar set by hibernate
+										//@Lob is ontop of String field, hibernate will automatically set the column to Clob
+		
+		}
+		
+08. Retrieving Objects using Session.get
+	
+	SessionFactory is created only once per application because it is a very expensive object
+			
+			public class HibernateTest{
+				
+				public static void main(String[] args){
+					UserDetails user = new UserDetails();
+					//call setters to set all properties of user
+					
+					StandardServiceRegistry standardRegistry = new StandardServiceRegistryBuilder().configure( "hibernate.cfg.xml" ).build();
+					Metadata metadata = new MetadataSources( standardRegistry ).getMetadataBuilder().build();
+					SessionFactory sessionFactory = metadata.getSessionFactoryBuilder().build();
+
+					Session session = sessionFactory.openSession();
+					session.beginTransaction();
+					session.save(user);
+					session.getTransaction().commit();
+					session.close();
+					
+					user = null;
+					
+					session = sessionFactory.openSession();
+					session.beginTransaction();
+					//*we don't deal with tables directly, instead we deal with objects and classes*
+					//*second arg tells hibernate what is the data we are looking for by specifying the PRIMARY KEY*
+					//*get() method returns an object, need to cast it
+					user = (UderDetails)session.get(UserDetails.class, 1);
+					System.out.println("User Name retrieve is " + user.getUserName());
+					session.getTransaction().commit();
+					session.close();
+				}
+			
+			}
+			
+09. PRIMARY KEY
+	Creating an PRIMARY KEY on the table with @Id
+	
+	Natural key VS. Surrogate key
+		Natural key: unique and mandatory column in a table
+			example: user's email
+			we can provide the value
+		
+		Surrogate key: not column is unique in a table
+			add a column to be the primary key, this column does NOT carry any significance - does NOT have business usage
+			ask hibernate to provide the value for us every time we do insert
+			
+		Telling hibernate to generate the value
+		
+			@Entity
+			@Table (name = "USER_DETAILS")
+			public class UserDetails{
+				@Id
+				@GeneratedValue
+				private int userId; //hibernate will look at the type of this field and generate the value
+			}
+			
+		configuring the generated value
+			@GeneratedValue (strategy=GenerationType.AUTO) // similar to not specifying any strategy, let hibernate make decisions
+														   // *recommanded 
+			@GeneratedValue (strategy=GenerationType.IDENTITY) // use the identity column of a table to generate primary key 
+															   //*not all database offers this feature
+			@GeneratedValue (strategy=GenerationType.SEQUENCE) // use sequence to generate the primary key
+			@GeneratedValue (strategy=GenerationType.TABLE) // use separate table which has record of the last primary key, 
+															// hibernate will create separate table and use it for generating primary key 
+															
+
+10. Value Types and Embedding objects
+	
+	Handling fields that are objects
+		UserDetails class has a field, address, which is an object of type Address
+		Address is not a String any more, it includes 4 fields
+		
+	Value object VS. Entity object
+		Value object
+			object has data, but does not have meaning by itself, it provides meaning to Entity objects
+			address object does NOT have purpose itself, it only has meaning when it connects to an UserDetails object
+		
+		Entity object
+			object has meaning on its own
+	
+	Approachiong Value objects differently
+		Has to associtated with an Entity object
+		
+		Can have the Value object stored inside the table of an Entity object
+			All the fields of the Value object will be stored as separate columns 
+			
+			@Embeddable
+			public clas Address{
+				
+				private String street;
+				private String city;
+				private String state;
+				private String pincode;
+				
+				//getters and setters
+			
+			}
+			
+			Mark the class as Value object type, telling hibernate not to create separate table for the class
+				@Embeddable   //javax.persistence.Embeddable;
+			
+	Using the Value object inside Entity object
+		
+		@Entity
+		@Table (name="USER_DETAILS")
+		public class UserDetails{
+			@Id
+			@GeneratedValue(strategy=GenerationType.AUTO)
+			private int userId;
+			private String userName;
+			@Embedded
+			private Address address;
+			
+			//getters and setters 
+		}
+		
+		Setting the Value class as @Embeddable
+		Setting variable of this Value class as @Embedded inside the Entity class 
+		
+11. AttributeOverrides and Embedded Object Keys
+	
+	Setting the column name for the fields of the embedded object
+	
+		Setting default names for the fields of the embedded object
+		
+			@Embeddable
+			public class Address{
+				@Column (name="STREET_NAME")
+				private String street;
+				
+				@Column (name="CITY_NAME")
+				private Sting city;
+				
+				@Column (name="STATE_NAME")
+				private String state;
+				
+				@Column (name="PIN_CODE")
+				private String pincode;
+				
+				//getters and setters
+			
+			}
+			
+		Having more than one embedded objects of the same type inside an Entity class
+		
+			Overriding the default names when embedding, giving unique column names for each embedded object's field
+			
+			@Entity
+			@Table (name="USER_DETAILS")
+			public class UserDetails{
+				@Id
+				@GeneratedValue(strategy=GenerationType.AUTO)
+				private int userId;
+				private String userName;
+				@Embedded
+				@AttributeOverrides({  //need to encapsulate all the single override into one annotation
+					@AttributeOverride (name="street", column=@Column(name="HOME_STREET_NAME") ),   //overrides one columns name
+					@AttributeOverride (name="city", column=@Column(name="HOME_CITY_NAME") ), 
+					@AttributeOverride (name="state", column=@Column(name="HOME_STATE_NAME") ), 
+					@AttributeOverride (name="pincode", column=@Column(name="HOME_PIN_CODE") )
+				
+				})
+				private Address homeAddress;
+				
+				@Embedded
+				private Address officeAddress;
+				
+			
+				//getters and setters 
+			}
+			
+		Using embedded value object as primary key
+			@Entity
+			public class UserDetails{
+				@EmbeddedId
+				private LoginName userId;
+			
+			}
+			
+
+
+12. Saving Collections
+	Having a collection as an object's field, an user has list of addresses
+		Marking Address class as @Embeddable, same as before
+		
+		Marking the collection as @ElementCollection , 
+		Telling hibernate to treate it as list and persist it into database
+			@Entity
+			@Table (name="USER_DETAILS")
+			public class UserDetails{
+				@Id @GeneratedValue(strategy=GenerationType.AUTO)
+				private int userId;
+				private String userName;
+				@ElementCollection
+				private Set<Address> listOfAddresses = new HashSet(); 
+				//when declaring collection variable, use the set interface, don't use implementation
+				
+				//getters and setters here
+			
+			}
+		
+
+		
+		Saving only the user object in the session, no need for saving the list of addresses
+			//In the HibernateTest.java class, main method
+			session.beginTransaction();
+			session.save(user);
+			session.getTransaction.commit();
+		
+		
+		Creating a separate table
+		Inserting the Address records from the collection into this table
+			insert into UserDetails_listOfAddresses (UserDetails_userId, STREET_NAME, CITY_NAME, STATE_NAME, PIN_CODE) value (....)
+		
+13. Configuring Collections and Adding Keys
+
+	Setting table name for collection
+		Default name is EntityName_collectionFieldName
+			Example: UserDetails_listOfAddresses
+			insert into UserDetails_listOfAddresses (UserDetails_userId, STREET_NAME, CITY_NAME, STATE_NAME, PIN_CODE) value (....)
+		
+		
+		changing default table name with @JoinTable(name="USER_ADDRESS")
+			@Entity
+			@Table (name="USER_DETAILS")
+			public class UserDetails{
+				@Id @GeneratedValue(strategy=GenerationType.AUTO)
+				private int userId;
+				private String userName;
+				@ElementCollection
+				@JoinTable(name="USER_ADDRESS")
+				private Set<Address> listOfAddresses = new HashSet(); 
+				//when declaring collection variable, use the set interface, don't use implementation
+				
+				//getters and setters here
+			
+			}
+		
+		Resulting table name: USER_ADDRESS
+			insert into USER_ADDRESS (UserDetails_userId, STREET_NAME, CITY_NAME, STATE_NAME, PIN_CODE) value (....)
+		
+		
+		
+	Setting the foreign key name for the collection table
+		Default name is EntityName_EntityPrimarykey
+			Example: UserDetails_userId
+			insert into UserDetails_listOfAddresses (UserDetails_userId, STREET_NAME, CITY_NAME, STATE_NAME, PIN_CODE) value (....)
+			
+		Changing default foreign key name with @JoinColumn(name="USER_ID")
+			@Entity
+			@Table (name="USER_DETAILS")
+			public class UserDetails{
+				@Id @GeneratedValue(strategy=GenerationType.AUTO)
+				private int userId;
+				private String userName;
+				@ElementCollection
+				@JoinTable(name="USER_ADDRESS", 
+						   joinColumns=@JoinColumn(name="USER_ID")
+				)
+				private Set<Address> listOfAddresses = new HashSet(); 
+				//when declaring collection variable, use the set interface, don't use implementation
+				
+				//getters and setters here
+			
+			}
+		
+		Resulting column name: USER_ID
+			insert into USER_ADDRESS (USER_ID, STREET_NAME, CITY_NAME, STATE_NAME, PIN_CODE) value (....)
+		
+	Defining index column for the collection table
+		Can not use Set collection anymore, Set has not index by definition
+		
+		Use Array or ArrayList that supports index
+		Define primary key for collection table with @CollectionId 
+				
+			@Entity
+			@Table (name="USER_DETAILS")
+			public class UserDetails{
+				@Id @GeneratedValue(strategy=GenerationType.AUTO)
+				private int userId;
+				private String userName;
+				@ElementCollection
+				@JoinTable(name="USER_ADDRESS", 
+						   joinColumns=@JoinColumn(name="USER_ID")
+				)
+				@GenericGenerator(name="hilo-gen", strategy="hilo")
+				@CollectionId(columns = {@Column(name="ADDRESS_ID") }, 
+							  generator = "hilo-gen", 
+							  type = @Type(type="long") 
+				)
+				private Collection<Address> listOfAddresses = new ArrayList<Address>(); 
+				//when declaring collection variable, use the collection interface, don't use implementation
+				//@CollectionId is not a JPA standard, hibernate implemented this feature: org.hibernate.annotations.CollectionId;
+				//@GenericGenerator is not a JPA standard, hibernate implemented this feature: org.hibernate.annotations.GenericGenerator;
+				/*ADDRESS_ID is NOT defined as a field in the Address class, but it is a column in the USER_ADDRESS table*
+				
+				//getters and setters here
+			
+			}	
+			
+14. Proxy Objects and Eager and Lazy Fetch Types  **IMPORTANT TOPIC**
+	Lazy initialization, initializing only the first level member variables, not the entire object *get it when you use it*
+		
+		Expensive to retrieve an user from the database if the list of addresses are big
+			user = (UserDetails) session.get(UserDetails.class, 1);
+	
+		No need for retrieving the list of addresses if we are interested in other info about the user
+		hibernate by defautl will not pull up this list of addresses from database for the user object
+	
+		but at the moment the getter method for accessing the list of addresses is called for the first time
+		hibernate will generate the list of addresses, pulling them from database 
+			user.getListOfAddresses();
+			
+		*The proxy class
+			hibernate creates the proxy class of the UserDetails class
+			this proxy class is a sub-class of the UserDetails class implementing the same methods
+			Instead of giving the actual object, hibernate gives an object of the proxy class
+		
+		
+	
+	Eager initialization, initialized entire object in the beginning
+		//inside the UserDetails.java class
+		@ElementCollection(fetch=FetchType.EAGER)
+		@JoinTable( name="USER_ADDRESS", 
+					joinColumns=@JoinColumn(name="USER_ID")
+		)
+		private Collection<Address> listOfAddresses = new ArrayList<Address>(); 
+		
+		object being returned is still a proxy object, because there could be other collections in the UserDetails class
+		
+15. One to One Mapping
+	
+	Entity inside an Entity
+	
+		Adding new Entity class and add this class to Hibernate.cfg.xml
+			@Entity
+			public class Vehicle{
+				@Id  @GeneratedValue
+				private int vehicleId;
+				private String vehicleName;
+			
+				//getters and setter here
+			
+			}
+			
+		Mapping the Vehicle class within the UserDetails class
+			@Entity
+			@Table (name="USER_DETAILS")
+			public class UserDetails{
+				@Id @GeneratedValue(strategy=GenerationType.AUTO)
+				private int userId;
+				private String userName;
+				@OneToOne
+				private Vehicle vehicle;
+				//vehicle is a separate Entity, not a Embedded object, it needs a separate table
+				//hibernate has a column in the USER_DETAILS table to point to the Vehicle table
+				
+				//getters and setters here
+			
+			}	
+			
+		Associating the vehicle with user
+			//inside the HibernateTest class, main method
+			UserDetails user = new UserDetails();
+			Vehicle vehicle = new Vehicle();
+			user.setVehicle(user);
+			
+		Need to save both Entity
+			//inside the HibernateTest class, main method
+			session.beginTransaction();
+			session.save(user);
+			session.save(vehicle);
+			session.getTransaction.commit();
+			session.close();
+			
+			
+		Resulting tables, first insert into USER_DETAILS without the vehicleId
+		because it may not know what the vehicleId is unless the insertion into the Vehicle table is made
+			insert into USER_DETAILS (userName, vehicle_vehicleId, userId) values (...)
+			insert into Vehicle (vehicleName, vehicleId) values (...)
+			update USER_DETAILS set userName=? , vehicle_vehicleId=? where userId=?
+			
+		Changing the join column name
+			//inside the UserDetails class
+			@OneToOne
+			@JoinColumn(name="VEHICLE_ID")
+			private Vehicle vehicle;
+			
+			
+16. One To Many Mapping
+	
+	One Entity containing a collection of another Entity
+		@Entity
+		@Table (name="USER_DETAILS")
+		public class UserDetails{
+			@Id @GeneratedValue(strategy=GenerationType.AUTO)
+			private int userId;
+			private String userName;
+			@OneToMany
+			private Collection<Vehicle> vehicle = new ArrayList<Vehicle>();
+			
+				
+			//getters and setters here
+			
+		}
+			
+	hibernate creates a separate table to manage this relationship: the JoinTable
+		Resulting table and SQL statements
+			insert into USER_DETAILS (userName, userId) values(...)
+			insert into Vehicle (vehicleName, vehicleId) values(...)
+			insert into Vehicle (vehicleName, vehicleId) values(...)
+			insert into USER_DETAILS_Vehicle (USER_DETAILS_userId, vehicle_vehicleId) values (...)
+			insert into USER_DETAILS_Vehicle (USER_DETAILS_userId, vehicle_vehicleId) values (...)
+			
+	Configuring the JoinTable
+		//inside the UserDetails class
+		@OneToMany
+		@JoinTable(	name="USER_VEHICLE",
+					joinColumns=@JoinColumn(name="USER_ID"),
+					inverseJoinColumns=@JoinColumn(name="VEHIClE_ID")
+		)
+		private Collection<Vehicle> = new ArrayList<Vehicle>();
+		
+		//resulting table and SQL
+		//insert into USER_DETAILS ...
+		//insert into Vehicle ...
+		//insert into Vehicle ...
+		//insert into USER_VEHICLE (USER_ID, VEHICLE_ID) values (...)
+		//insert into USER_VEHICLE (USER_ID, VEHICLE_ID) values (...)
+		
+	Creating reverse relationship in the Vehicle Entity class
+		
+		Modifying the Vehicle class, add add user field with @ManyToOne 
+			@Entity
+			public class Vehicle{
+				@Id @GeneratedValue
+				private int vehicleId;
+				private String vehicleName;
+				@ManyToOne
+				private UserDetails user;
+				//*adding this field does NOT result in adding a new column in the Vehicle table
+				//getters and setters here
+			
+			}
+		Adding the user object here makes it easy for a vehicle object to find the user object
+			*hibernate does lazy initialization for the user object, even when there is only one user per vehicle
+			
+			*Adding a convenience method in the UserDetails class for setting reverse relationship 
+				//in the UserDetails class
+				public void addVehicle( Vehicle vehicle ){
+					this.getVehicle().add(vehicle);
+					vehicle.setUser(this);
+				
+				}
+		
+			
+17. mappedBy and Many To Many Mapping	
+		
+		Adding a column in the Vehicle table for the many to one relationship because each vehicle can only have one user
+		
+			The object in the many side of the relationship has reference to the other object
+				The USER_DETAILS table cannot have a column for the VEHICLE_ID because one user can have many vehicles
+				The Vehicle table can have a column for the USER_ID because any vehicle can have only one user
+			
+			*Doing this can eliminate the extra mapping table, USER_VEHICLE 
+			
+			The mappedBy annotation tells where the mapping should happen
+			
+			@Entity
+			@Table (name="USER_DETAILS")
+			public class UserDetails{
+				@Id @GeneratedValue(strategy=GenerationType.AUTO)
+				private int userId;
+				private String userName;
+				@OneToMany (mappedBy="user")
+				private Collection<Vehicle> vehicle = new ArrayList<Vehicle>();
+				
+				//In order for this to work, 
+				//*a reverse ManyToOne relationship must set up in the other Entity class
+				//*the mappedBy property tell hibernate NOT to create an extra default table to handle this OneToMany relationship
+				//*the value for mappedBy is the field name in the other Entity class
+				
+				
+				//getters and setters here
+			
+			}	
+			
+			@Entity
+			public class Vehicle{
+				@Id @GeneratedValue
+				private int vehicleId;
+				private String vehicleName;
+				@ManyToOne
+				@JoinColumn(name="USER_ID")
+				private UserDetails user;
+				//* need to have this field here to eliminate the extra default mapping table
+				//* can use @JoinColumn to specify the column name
+				
+			}
+			
+			resulting table and SQL 
+				insert into USER_DETAILS (userName, userId) values (...)
+				insert into Vehicle (USER_ID, vehicleName, vehicleId) values (...)
+				insert into Vehicle (USER_ID, vehicleName, vehicleId) values (...)
+					
+					
+					
+		ManyToMany mapping
+			
+			Has to have an extra table, mapping cannot be done in the user table or in the vehicle table
+			
+				@Entity
+				public class Vehicle{
+					@Id @GeneratedValue
+					private int vehicleId;
+					private String vehicleName;
+					@ManyToMany
+					private Collection<UserDetails> userList = new ArrayList<UserDetails>();
+					
+				}
+				
+				@Entity
+				@Table (name="USER_DETAILS")
+				public class UserDetails{
+					@Id @GeneratedValue(strategy=GenerationType.AUTO)
+					private int userId;
+					private String userName;
+					@ManyToMany
+					private Collection<Vehicle> vehicle = new ArrayList<Vehicle>();
+
+					//getters and setters here
+			
+				}	
+				
+			After saving into the database, it results in two extra tables for managing this relationship
+			*one for the ManyToMany relationship in UserDetails, one for the ManyToMany relationship in Vehicle*
+			
+				//in the HibernateTest class, main method
+				user.getVehicle().add(vehicle);
+				user.getVehicle().add(vehicle2);
+				vehicle.getUserList().add(user);
+				vehicle2.getUserList().add(user);
+				
+				resulting table and SQL
+				insert into USER_DETAILS ...
+				insert into Vehicle ...
+				insert into Vehicle ...
+				insert into USER_DETAILS_Vehicle (USER_DETAILS_userId, vehicle_vehicleId) values(...)
+				insert into USER_DETAILS_Vehicle (USER_DETAILS_userId, vehicle_vehicleId) values(...)
+				insert into Vehicle_USER_DETAILS (Vehicle_vehicleId, userList_userId) values(...)
+				insert into Vehicle_USER_DETAILS (Vehicle_vehicleId, userList_userId) values(...)
+				
+		Telling hibernate to create only one table with mappedBy
+			
+			adding mappedBy in Vehicle Entity class because we want mapping to be done in the UserDetails class using USER_DETAILS_Vehicle table
+				//in the Vehicle Entity class
+				@ManyToMany (mappedBy="vehicle")
+				private Collection<UserDetails> userList = new ArrayList();
+				
+		Can configure the JoinTable name and joinColumns and inverseJoinColumns names as in previous tutorials
+			configuration has to be specified in the UserDetails Entity class because we tell hibernate to do only in the UserDetails class
+		
+				
+			
+18. CascadeTypes and Other Things
+
+	In a @ManyToOne relationship inside the Vehicle class, what happen if vehicle has NO user
+		
+		Hibernate will throw exception if this vehicle has no user
+			//inside the Vehicle Entity class
+			@ManyToOne
+			private UserDetails user;
+		
+		Suppressing this exception, when user object is null, @NotFound
+		
+			@Entity
+			public class Vehicle{
+				@Id @GeneratedValue
+				private int vehicleId;
+				private String vehicleName;
+				@ManyToOne
+				@NotFound(action=NotFoundAction.IGNORE)
+				private UserDetails user;
+				//@NotFound is implemented by hibernate: or.hibernate.annotations
+			
+			}
+		
+	Hibernate Collections	
+		Bag semantic - List/ArrayList
+		Bag semantic with ID - List/ArrayList
+			Bag can NOT be order
+		List semantic - List/ArrayList
+			List can be order
+		Set semantic - Set
+			similar to Set in java
+		Map semantic - Map
+			similar to Map in java
+			
+			
+	Cascade, applying to all relationship: @OneToOne, @OneToMany/@ManyToOne, @ManyToMany
+		In a @ManyToMany relationship, need to do same actions to both side
+			//in the HibernateTest class, main method
+				session.beginTransaction();
+				session.save(user);
+				session.save(vehicle);
+				session.save(vehicle2);
+				session.getTransaction().commit();
+				session.close();
+				//saving user also requires saving all vehicles, problem comes when the list of Vehicles is big
+				//saving only the user object will result in exception
+				//habernate is not auto saving these two vehicle objects
+				//Vehicle is an Entity class, has life of its own 
+				//Vehicle is not bound by the user, so not auto save
+				
+		Telling hibernate to save the Collection of Entity when saving user object
+			Modifying the UserDetails class, add the cascade property
+			
+			@Entity
+			@Table (name="USER_DETAILS")
+			public class UserDetails{
+				@Id @GeneratedValue(strategy=GenerationType.AUTO)
+				private int userId;
+				private String userName;
+				@OneToMany(cascade=CascadeType.PERSIST)
+				private Collection<Vehicle> vehicle = new ArrayList<Vehicle>();
+			}
+			
+			Also need to modify the HibernateTest class, replace session.save() with session.persist()
+				//inside the HibernateTest class, main method
+				session.beginTransaction();
+				session.persist(user);
+				session.getTransaction.commit();
+				session.close();
+				//*change to method to persist because we set the cascade type to PERSIST in the UserDetails class
+		
+			Resulting table and SQL
+				insert into USER_DETAILS ...
+				insert into Vehicle ...
+				insert into Vehicle ...
+				insert into USER_DETAIL_Vehicle (USER_DETAILS_userId, vehicle_vehicleId) values (...);
+				insert into USER_DETAIL_Vehicle (USER_DETAILS_userId, vehicle_vehicleId) values (...);
+				
+			For delete use @OneToMany(cascade=CascadeType.REMOVE)	
+			
+			For all actions use @OneToMany(cascade=CascadeType.ALL)	
+			
+		
+
+19. Implementing Inheritance
+	mapping inheritance of classes to relational tables
+		Extending the Vehicle class TwoWheeler class and FourWheeler class
+			How to save objects for these three classes into tables into the database
+			Each sub-class can have additional fields besides these inherit from parent class
+			Can make each sub-class as Entity and save into different tables
+		
+		Polymorphism of Object Oriented Programing
+			Dynamically assigning a TwoWheeler or a FourWheeler object to a Vehicle variable
+			If having separate table for TwoWheeler and FourWheeler, How to reference them from the User table
+			The User table has one column for Vehicle which will contain a foreign key
+			*Problem: This foreign key can point to only one table
+			But there are two tables TwoWheeler and FourWheeler
+				if User has TwoWheeler, then contain foreign key refering to the TwoWheeler table
+				if User has FourWheeler, then contain foreign key refering to the FourWheeler table
+				
+			*Another Problem: a new field is added into the parent class
+				The two sub-classes will get this new field added automatically
+			The parent class's table will have a column added automatically
+				But Need to add a column to each sub-class's table manually in the database
+				Because we are marking these two classes as Entity classes
+			
+			*Need to use hibernate's support for inheritance
+	
+		Adding two classes entends the Vehicle class, not telling hibernate to use its inheritance support
+			@Entity
+			public class Vehicle{
+				@Id @GeneratedValue
+				private int vehicleId;
+				private String vehicleName;
+				
+				//getter and setters here
+			
+			}
+			
+			@Entity
+			public class TwoWheeler extends Vehicle{
+				
+				private String SteeringHandle;
+				
+				//getters and setters here
+			
+			}
+			
+			@Entity
+			public class FourWheeler extends Vehicle{
+			
+				private String SteeringWheel;
+				
+				//getters and setters here
+			}
+			
+			
+			//in the HibernateTest class, main method
+			//create three objects one for each class, bike is TwoWheeler, car is FourWheeler
+			session.save(vehicle);
+			session.save(bike);
+			session.save(car);
+			
+			//also add these two new Entity classes in the hibernate.cfg.xml
+			
+		Resulting table and SQL
+			Only one table is created, the Vehicle table
+				insert into Vehicle (vehicleName, DTYPE, vehicleId) values (...)
+				insert into Vehicle (vehicleName, SteeringHandle, DTYPE, vehicleId) values (...)
+				insert into Vehicle (vehicleName, SteeringWheel, DTYPE, vehicleId) values (...)
+				
+		Hibernate does NOT create separate tables even we mark these three classes as Entity classes
+			Hibernate by default uses the single table strategy
+			Mapping everything into the table for parent class, Vehicle
+				The table has columns for fields from sub-classes
+				And an addition column, DTYPE, which stores the class name of an object
+			
+			
+20. Implementing Inheritance - Single Table Strategy
+	
+	One table for all classes: parent class and sub-classes
+		Table contains columns for all fields from different classes, plus the DTYPE Column  
+		Value of a column will be empty if object does NOT have that field defined in its class
+		DTYPE is called the discriminator
+		
+	Single Table Strategy is the default way hibernate implements inheritance
+		Hibernate does this by default, but we can also specify it. 
+			//*not required as single table is by default
+			@Entity
+			@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
+			public class Vehicle{
+				@Id @GeneratedValue
+				private int vehicleId;
+				private String vehicleName;
+				
+				//getters and setter here
+			
+			}
+		
+		Configuring the discriminator
+			Changing the discriminator column name
+				@Entity
+				@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
+				@DiscriminatorColumn(
+					name="VEHICLE_TYPE",
+					discriminatorType=DiscriminatorType.STRING
+				)
+				public class Vehicle{
+					@Id @GeneratedValue
+					private int vehicleId;
+					private String vehicleName;
+					
+					//getters and setter here
+				
+				}
+			Changing the value stored in this column for a class, by default it is the class name
+				@Entity
+				@DiscriminatorValue("Bike")
+				public class TwoWheeler extends Vehicle{
+					private String SteeringHandle;
+					
+					//getters and setters here
+				
+				}
+				
+				
+				@Entity
+				@DiscriminatorValue("Car")
+				public class FourWheeler extends Vehicle{
+					private String SteeringWheel;
+					
+					//getters and setters here
+				}
+	
+21. Implementing Inheritance with Table Per Class Strategy
+	Changing inheritance type to TABLE_PER_CLASS
+		Removing the @Discriminator annotation from each class
+			@Entity
+			@Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
+			public class Vehicle{
+				@Id @GeneratedValue
+				private int vehicleId;
+				private String vehicleName;
+				
+				//getters and setter here
+			
+			}
+		
+		Still need to mark all sub-class as @Entity
+		
+			@Entity
+			public class TwoWheeler extends Vehicle{
+				private String SteeringHandle;
+				
+				//getters and setters here
+			
+			}
+				
+				
+			@Entity
+			public class FourWheeler extends Vehicle{
+				private String SteeringWheel;
+				
+				//getters and setters here
+			}
+		Sub-classes inherit both the fields and the annotation from parent class
+			Example: annotation for vehicleId
+			Each sub-class will have its own table regardless the level of inheritance
+			Each table of sub-class will have its own columns for fields inherit from parent class 
+			Each table of sub-class will only store objects from this child class
+		
+		Resulting tables and SQL
+			insert into Vehicle (vehecleName, vehicleId) values (...)
+			insert into TwoWheeler (vehicleName, SteeringHandle, vehicleId) values (...)
+			insert into FourWheeler (vehicleName, SteeringWheel, vehicleId) values (...)
+			
+		Advantage of TABLE_PER_CLASS is that tables are in normalized form
+			No extra columns which do not have data
+				If class of an object does not have that field
+	
+			
+
+22. Implementing Inheritance with Joined Strategy
+	More efficient strategy, @Inheritance(strategy=InheritanceType.JOINED)
+	The data of the fields inherit from the parent class does NOT goes into the child table
+	It remains in the parent table
+		Having a table for the parent class
+			This table has a column for each field of the parent class 
+			Objects of pareent class will have record here
+			Objects of child class will also have record here
+		Having one table for each child class
+		    This table has columns that are only specific for the child class, 
+				NOT including fields inherit from parent class
+			Only objects of the child class will have record here
+		
+		All tables will have a common column with the same name, for example vehicleId
+			Child object will have one record in the parent table and one record in the child table
+			Both record will have same value for the common column, vehicleId
+		
+		Extracting data using Join, For example: to get all the FourWheelers
+			select * from Vehicle join FourWheeler on Vehicle.vehicleId = FourWheeler.vehicleId
+			
+	The only change made is the Vehicle.java class
+		@Entity
+		@Inheritance(strategy=InheritanceType.JOINED)
+		public class Vehicle{
+			@Id @GeneratedValue
+			private int vehicleId;
+			private String vehicleName;
+				
+			//getters and setter here
+			
+		}
+		
+
+23.CRUD Operations
+	Create table and insert records : session.save()
+		//after creating an user object
+		session.beginTransaction();
+		session.save(user);
+		session.getTransaction().commit();
+		session.close();
+	
+	Read the data object: session.get()
+		session.beginTransaction();
+		UserDetails user = (UserDetails) session.get(UserDetails.class, 6);
+		session.getTransaction().commit();
+		session.close();
+		
+	Delete the data object: session.delete()
+		//delete() method takes an object
+		session.beginTransaction();
+		UserDetails user = (UserDetails) session.get(UserDetails.class, 6);
+		session.delete(user);
+		session.getTransaction().commit();
+		session.close();
+		//generated SQL
+		//delete from UserDetails where userId = 6
+	
+	Update the data object: session.update()
+		//update() method takes an object
+		session.beginTransaction();
+		UserDetails user = (UserDetails) session.get(UserDetails.class, 5);
+		user.setUserName("Updated User");
+		session.update(user);
+		session.getTransaction().commit();
+		session.close();
+		//generated SQL
+		//update UserDetails set userName="Updated User" where userId = 5
+		
+24. Transient, Persistent and Detached Objects *Important Fundamental Concepts
+		Transient object
+			Object that is NOT saved by calling session.save()
+			Hibernate does NOT know about this object
+		
+		Persistent object
+			Object that is saved by calling session.save()
+			Hibernate tracks this object
+				//after creating an user object
+				session.beginTransaction();
+				session.save(user);
+				user.setUserName("Updated User"); //* this info will get into database
+				session.getTransaction().commit();
+				session.close();	
+				//Once an object is saved into the database, 
+				//The last change to this object before the session is close and commit
+				//will be saved into the database
+				
+		Detached object
+			Hiberate will no longer keep track of this object, it was tracked by hibernate before
+			Object is ditached after session is closed: session.close()
+			Changes make to detached object will not be saved into database
+			
+	
+	
+25. Understanding State Changes
+		
+	Transient --> Persistent --> Detached
+	
+		-new()-> Transient -session.save()-> Persistent -session.close()->Detached
+			when an object is first created with new(), it is Transient
+			when an object is save(), it become Persistent
+				hibernate will keep track of changes and update database accordingly
+			when the session is close, object is Detached
+			
+		-get()-> Persistent -session.close()-> Detached
+			After reading an object from database with get(), object is Persistent 
+			we can make changes to the object and hibernate will update database depending on the changes
+			calling session.update() is optional
+			
+		Transient <-session.delete()- Persistent -session.close()-> Detached
+			After delete() the object becomes Transient because there is no data in database for this object
+			Hibernate has NO need to keep track it 
+			       |             |
+		Transient --> Persistent --> Detached
+			       |             |
+				   |  Session    |
+			       |             |
+			The state changes is related to session environment
+				Before entering the Session environment: Transient
+				After entering the Session environment: Persistent
+				Exiting the Session environment: Detached
+				
+				
+				
+26. Persisting Detached Objects
+	In a real life scenario: get an object out of database, update the object, save object back to database
+		User may take long time to update object before saving back to database
+			Not a good idea using long transaction, blocking other users
+				Have one transaction for fetching object from database
+				Let User do changes to object
+				Have another transaction for saving object back to database
+			
+			Object becomes Detached after closing the first transaction, when user is updating it
+			Need to have it back to Persistent state when saving it back to database
+				Session session = sessionFactory.openSession();
+				session.beginTransaction();
+				UserDetails user = (UserDetails) session.get(UserDetails.class, 1);
+				session.getTransaction().commit();
+				session.close();	
+				
+				//close transaction 
+				//let user do changes here
+				user.setUserName("Updated User after session close");
+				
+				session = sessionFactory.openSession();
+				session.beginTransaction();
+				//*Hibernate find the record in database with the user object's userId, and update it
+				session.update(user); 
+				//*any changes made after calling update(), will also get persisted into database 
+				//because object is in persistent state
+				session.getTransaction().commit();
+				session.close();
+				
+				//*Hibernate ALWAYS generate an update SQL statement when update() is call to detached object
+				//because hibernate does NOT know if any change has been made to the object when it is detached
+				//Hibernate does NOT keep track of object when it is detached
+				
+				
+				
+		
+	
+	
+	
+	
+			
+	
+		
+	
+		
+	
+	
+		
+
+			
+	
+					
+			
+			
+				
+			
+			
+			
+	
+		
+	
+		
+	
+	
+		
+
+			
+	
+					
+			
+			
+		
+
+	
+	
+	
+			
+	
+		
+		
+		
+	
+	
+			
+			
+		
+		
+		
+		
+			
+
+	
+	
+			
+		
+	
+		
+		
+
+
+		
+		
+		
+		
+		
+		
+	
+	
+
+			
+			
+		
+			
+		
+		
+		
+		
+		
+		
+	
+		
+		
+		
+		
+	
+	
+	
+	
