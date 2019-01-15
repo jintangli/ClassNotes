@@ -1,0 +1,304 @@
+PL/SQL: 
+	Procedural Language/Standard Query Language
+	significant member of Oracle programming tool set
+	** extensively used to code *server side programming
+	** Case-insensitive programming language
+	**program written in PL/SQL is divided into blocks
+		blocks are basic programming units
+		
+	types of blocks
+		**Anonymous block
+		**named block
+	
+	blocks are devided into three sections
+		**Declaration section
+			optional
+		**Execution section
+			mandatory
+		**Exception-handling section
+			optional
+			
+	prototype of Anonymous Block
+		Declare
+			Declaration statement
+			
+		BEGIN
+			Execution statements
+		
+		Exceptions
+			Exception-handling statements
+		END:
+	
+	Declaration section
+		start with keyword DECLARE
+		contains definition of PL/SQL identifiers such as variables, constants, cursors
+		all local variables used in the program are defined and documented
+		
+	Execution Section
+		contains executable statements manipulate the variables declared in the Declaration section
+		Begins with the Keyword BEGIN
+		Ends with the Keyword END
+		*mandatory section in PL/SQL block
+		support all DML commands and SQL*plus built in functions
+		support DDL commands using native dynamic SQL or DMBS_SQL built-in package
+		
+	Exception-handling Section
+		last section of PL/SQL block
+		optional section
+		contains statements executed when a *runtime error occurs
+		
+
+PL/SQL variables in Oracle Database 
+	variables are place holder in memory that hold some data
+	**every variable must have Valid Name, Datatype, Data width
+	variable muct be declared prior to its use
+	
+	SET SERVEROUTPUT ON;
+		display result on default output device
+		
+	when variable is first declared, it is empty and holds no data
+	
+	initialize variable
+		**can be done in DECLARE, Execution and Exception-handling section of program
+		assignment operator is :=	
+	
+	output string using DBMS_OUTPUT.PUT_LINE(v_test);	
+		
+	example
+		SET SERVEROUTPUT ON;
+		DECLARE
+			v_test VARCHAR2(15) := 'Jin runs';
+		BEGIN
+			v_test := 'Jin is good';
+			DBMS_OUTPUT.PUT_LINE(v_test);
+		END; 
+
+		
+SELECT INTO statement in PL/SQL		
+	**initialize variable using SELECT INTO
+	**initialize a variable by fetching data from any *table of a database
+		variable's data type and data width *must match with table column
+	SELECT INT is a executable statement
+		*thus will go into *execution section
+	
+	put "/" when done writting anonymous or named block
+		"/" indicates that completion of block
+	
+	** variable v_fname and v_salary can hold only one data at a time
+		thus make sure your select statement will return data
+		from one row at a time. you can *ensure this by using 
+		*WHERE clause
+	
+	** the value from salary and first name columns will be stored into
+		variable v_salary and v_fname respectively hence you should always 
+		make sure that the data type and data width of the variable *matches
+		that of the columns
+	
+		set SERVEROUTPUT ON;
+		DECLARE
+			v_salary NUMBER(8);
+			v_fname VARCHAR2(20);
+		BEGIN
+			SELECT salary, first_name INTO v_salary, v_fname FROM employees
+			WHERE employee_id = 100;
+			DBMS_OUTPUT.PUT_LINE(v_fname || ' has salary ' || v_salary);
+		END;
+
+		
+Anchored Datatype in PL/SQL		
+	Anchored Datatypes
+		are those data type which you assign to a variable based on a database
+		unlike the variable data type, it is NOT dependent on that of underlying object
+	
+	syntax
+		variable-name typed-attribute %Type
+			type-attribute can be anything such as 
+				previously declared PL/SQL variable
+				or column of a table
+			%Type is the direct reference to the underlying database object
+			
+			example
+				v_fname students.first_name%TYPE;
+				**this will assign the data type and data width of column first_name to variable v_fname
+					means the datatype of v_fname will be VARCHAR2(8)
+	
+	**SELECT INTO statement makes the variable dependent on column of the table
+		what if we don't know the data type and data width of the table column
+		or if someone modify the definition of the table column
+		
+	**No matter what happens to the base table or its column, 
+		Anchored DataType keeps your code and its variable in *SYNC	
+		
+		
+		CREATE TABLE Students ( STU_ID NUMBER(2) ID NOT NULL AUTO INCREMENT, 
+								FIRST_NAME VARCHAR2(8) NOT NULL);
+	
+		SET SERVEROUTPUT ON;
+		DECLARE
+			v_fname students.first_name%TYPE;
+		BEGIN
+			SELECT first_name INTO v_fname FROM students where stu_id=1;
+			DBMS_OUTPUT.PUT_LINE(v_fname);
+		END;
+		
+		/
+		
+		DECLARE
+			v_fname VARCHAR2(8)
+		BEGIN
+			SELECT first_name INTO v_fname FROM students where stu_id=1;
+			DBMS_OUTPUT.PUT_LINE(v_fname);
+		END;
+		
+		
+PL/SQL Constants in Oracle Database
+	Constant is a user defined identifier whose value remains unchanged
+		throughout the program
+	
+	Constants need to be declared prior to their use
+		can only declare them in the Declaration section
+		
+	syntax
+		constant-name CONSTANT datatype (dw):= value;
+			CONSTANT is a keyword
+			**must initialize a constant at its declaration IN DECLARE section
+				can NOT initialize constant anywhere else
+			
+		**can use *default keyword instead of assignment operator to initialize constant
+		
+		**can impose NOT NULL constraint while declaring constant as well as variables
+			NOT NULL before := or DEFAULT
+
+
+		
+		SET SERVEROUTPUT ON;
+		DECLARE
+			v_pi CONSTANT NUMBER(7,6) := 3.141592;
+		BEGIN
+			DBMS_OUTPUT.PUT_LINE(v_pi);
+		END;
+		
+		/
+		
+		SET SERVEROUTPUT ON;
+		DECLARE
+			v_pi CONSTANT NUMBER(7,6) NOT NULL DEFAULT 3.141592;
+		BEGIN
+			DBMS_OUTPUT.PUT_LINE(v_pi);
+		END;
+		
+Bind variable in PL/SQL
+	two type of variables in orable database
+		user variables
+			can only declared inside the DECLARE section
+		bind variables or host variables
+			can be declared anywhere in the *host envoronment
+	
+	** Bind variables in Oracle database can be defined as the variable
+		that we create in SQL PLUS and then reference in PL/SQL
+		
+	declare bind variable
+		using *variable command
+		**do NOT any PL/SQL block or section
+		
+	initialize bind variable
+		initialize using 'Execute' or 'EXEC' command
+			example:
+				VARIABLE v_bind1 VARCHAR2(10);
+				EXEC :v_bind1 ;= 'JinLi';
+		
+		initialize using PL/SQL block
+			example:
+				VARIABLE v_bind1 VARCHAR2(10);
+				BEGIN
+					:v_bind1 := 'JinLi';
+				END;
+		
+		**need to put : in front of variable name when initialize it
+			we can reference bind variable in PL/SQL by using a colon :
+				follow immediately by the name fo the variable
+		
+	display the value store in bind variable
+		using DBMS_OUTPUT
+			**can only execute this statement in Execution section of PL/SQL block
+			
+			example:
+				VARIABLE v_bind1 VARCHAR2(10);
+				SET SERVEROUTPUT ON;
+				BEGIN
+					:v_bind1 := 'JinLi';
+					DBMS_OUTPUT.PUT_LINE(:v_bind1);
+				END;
+				/
+		using print command
+			**can write this command in host envoronment rather than inside any PL/SQL
+				does NOT require any PL/SQL block for execution
+			
+			example:
+				VARIABLE v_bind1 VARCHAR2(10);
+				PRINT :v_bind1;
+				
+		using AUTOPRINT
+			by setting the AUTOPRINT parameter on
+				after setting AUTOPRINT parameter ON
+				oracle server will print the value of your bind variable
+				automatically without the use of any specific command or statement
+				
+			example:
+				SET AUTOPRINT ON;
+				VARIABLE v_bind1 VARCHAR2(30);
+				EXEC :v_bind2 := 'Manish';
+				
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		
+
+
+
+

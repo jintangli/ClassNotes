@@ -1,0 +1,56 @@
+database triggers
+	triggers
+		Named PL/SQL blocks which are store in the database
+		specialized stored programs which execute implicitly 
+			when a triggering event occurs
+		**cannot run and execute them directly
+			they only get triggered by events in the database
+			
+	events that trigger execution
+		DML statement
+			any update, insert, delete executing on any table in database
+		
+		DDL statement
+			any create or alter, 
+				these triggers are generally used by DBAs for auditing purposes
+				
+		system event
+			shutdown or startup of database
+
+		User event
+			logoff or logon
+	
+	
+	types of triggers
+		DML triggers
+			triggers depend on DML statement
+			
+		DDL statement
+			triggers created over DDL statement
+			
+		System/database event triggers
+			triggers depend on system events
+			
+		instead-of triggers
+			enables you to stop and redirect the performance of a DML statement
+			helps you in managing the way you write non-updatable views
+			
+		compound triggers
+			multi-tasking triggers that act as both statement as well as Row-level triggers
+				when the data is inserted, updated, or deleted from a table
+			can be used to audit, check, save and replace the values before they are changed 	
+		
+
+
+	CREATE [OR REPLACE] TRIGGER trigger_name 
+	{BEFORE|AFTER} trigger_event on table_name
+	[FOR EACH ROW] [FOLLOWS another_trigger_name]
+	[ENABLE/DISABLE] [WHEN condition]
+	DECLARE
+		declaration statements
+	BEGIN
+		executable statements
+	END;
+	
+		
+			

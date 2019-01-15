@@ -1,0 +1,43 @@
+database views
+	views are like temporary tables
+		shortcut for not re-typing a query each time it is used
+	
+	**views do NOT contain any real data
+		they are holding data from *other tables
+		
+	view is a view into another table
+		
+when to use a view
+	return the top 10 most bided items
+		SELECT id, name, bids, FROM items ORDER BY bids DESC LIMIT 10
+	
+	if we want to diplay this info in different places in our app
+		we can run this query every time we want to display this info
+		
+	**better solution is to use a view
+		make a view out of this query
+	
+			CREATE VIEW mostbids AS
+				SELECT id, name, bids FROM items ORDER BY bids DESC LIMIT 10
+	
+		**view do not hold any data
+			its data comes from the table 
+			
+		**data on the view is dynamic
+			view data changes if table data is updated
+			**better than creating a new table 
+				which will need to be updated whenever parent table is updated
+	
+	**we can treat view as a table
+		run select statements on a view
+			select name, bids from mostbids
+	
+	
+to find out all the views created in a database	
+	
+	select * from INFORMATION_SCHEMA.VIEWS;
+	
+
+		
+			
+		
