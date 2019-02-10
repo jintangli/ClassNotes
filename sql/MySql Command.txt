@@ -1,0 +1,34 @@
+install mysql
+	sudo apt-get update
+	sudo apt-get install mysql-server
+	systemctl start mysql
+	cd /usr/bin/
+	mysql -u root -p
+   	  password: ubuntu
+
+install mysql java connector
+	sudo apt-get install libmysql-java
+
+list all database
+	show databases;
+	
+create new database user, username: hibernate, password: ubuntu
+	GRANT ALL PRIVILEGES ON *.* TO 'hibernate'@'localhost' IDENTIFIED BY 'ubuntu';
+	
+show all users
+	SELECT User, Host FROM mysql.user;
+	
+exit mysql
+	\q
+	
+log into mysql with user name password: ubuntu
+	mysql -u hibernate -p
+	
+create new database, dbname: HibernateProject
+	CREATE DATABASE dbname;
+
+use the name database, dbname is HibernateProject
+	use dbname;
+
+show all tables in a database
+	show tables;
