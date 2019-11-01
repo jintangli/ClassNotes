@@ -183,6 +183,49 @@ plotting data
 
 
 ----------------------------------------------------------------------------------------------------------------
-plotting data
+control statements: for, while, if
 ----------------------------------------------------------------------------------------------------------------
-  
+  create 10 x 1 matrix with all zeros: v = zeros(10, 1)
+  for loop through v: for i = 1:10,
+                    v(i) = 2^i;
+                  end;
+  using indices to do the same: indices = 1 : 10;
+                                for i = indices,
+                                  disp(i);
+                                end;
+
+  while loop through v: i = 1;
+                        while i <= 5,
+                          v(i) = 100;
+                          i = i + 1;
+                        end;
+
+  while loop with break:  i = 1;
+                          while true,
+                            v(i) = 999;
+                            i = i + 1;
+                            if i == 6,
+                              break;
+                            end;
+                          end;
+
+  if else statement: if v(1) == 1,
+                        disp('The value is one');
+                     elseif v(1) == 2,
+                        disp('The value is two');
+                     else
+                        disp('The value is not one or two');
+                     end;
+
+  define functions:
+    first create .m file: squareThisNumber.m
+    file content:   function y = squareThisNumber(x) % y is the return value, x is the argument for functions
+                    y = x^2;
+    call function from the directory where file is located: squareThisNumber(5)
+    or add directory to Octave search path: addpath('C:\path\to\squareThisNumber.m\directory\')
+
+    functions can return multiple values: function [y1, y2] = squareAndCubeThisNumber(x)  % y1 and y2 are return values
+                                          y1 = x^2;
+                                          y2 = x^3;
+    call function and save it into variable: [a, b] = squareAndCubeThisNumber(5)  % a is 25 and b is 125
+    
