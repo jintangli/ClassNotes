@@ -1,0 +1,188 @@
+Octave notes (Machine Learning/Artificial Intelligence)
+
+change default prompt:
+  change prompt to '>>': PS1('>> ');
+  find location Octave is running: pwd
+  change to new location: cd 'c:\new\path'
+  list all files in current location: ls
+
+manipulate data, moving data around:
+  load file: load('featureX.dat') %Octave uses single quotation, creates variable named featureX
+  show all the variables currently in memory: who
+  show more details of all the variable currently in memory: whos
+  remove one variable from memory: clear featureX
+  remove all variable from memory: clear
+  save variable v into file: save hello.mat v %save v into file named hello.mat
+  save variable v into text file: save hello.txt v -ascii
+  get element in row x, column y of matrix A: A(x, y);
+  get all elements in the second row of matrix A: A(2, :);     %colon mean every element along that row or column
+  get all elements in the third column of matrix A: A(:, 3);   %colon mean every element along that row or column
+  get all elements in the first and third row of matrix A: A([1 3], :)
+  set the second column of A with new values: A(:, 2) = [11; 12; 13] %value for column need to be column vector
+  append another column to the right of A: A = [A, [100; 200; 300]]; %value for new column need to be column vectors
+  put all elements of A into single column vector: A( : );
+  concatenating two matrix A and B: C = [A B]
+  put matrix A on top of matrix B: C = [A ; B] % semicolon means starting new line
+
+suppressing outputs:
+  output on next line:  1+2
+    ans = 3
+  semicolon suppress outputs for the line: 1+2;
+
+comments:
+  comment line start with: %
+
+looking for help:
+  find more info about eye() function: help eye
+
+elementary math operations:
+  addition: 5+6;
+  subtraction: 6-5;
+  multiplication: 6*5;
+  division: 1/2;
+  exponential: 2^6;
+
+logical operations:
+  equal: 1 == 6;       %return 0 which means false
+  not equal: 1 ~= 6;   %return 1 which means true
+  and: 1 && 0;
+  or: 1 || 0;
+  xor: xor(1, 0);
+
+variables:
+  set variable a equal to number: a = 3;
+  set variable a equal to string: b = 'hi';
+  view variable value: a  %enter variable name without semicolon
+    a = 3
+
+print out variable values:
+    set variable value: a = pi;
+    print a: a %without semicolon
+      a = 3.1415
+    disp() function output value on console: disp(a);
+      3.1415
+    sprintf() function generates a string: disp( sprintf('2 decimals: %0.2f', a) );
+      2 decimals: 3.14
+    display long digits: format long;
+    display short digits: format short;
+
+vectors and matrix:
+  generate 3 by 2 matrix: A = [1 2; 3 4; 5 6] %semicolon delineates end of row in matrix
+  can put rows in different rows: A = [1 2;
+                                       3 4;
+                                       5 6]
+  generate 1 by 4 vector: v = [1 2 3 4];
+  generate 4 by 1 vector: v = [1; 2; 3; 4];
+  auto generate vector with incremental steps: v = 1:0.1:2    %start from 1, increment by 0.1, end by 2
+    v = [1 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9 2]
+  auto generate vector: v = 1:6     %start from 1, increment by 1, end by 6
+    v = [1, 2, 3, 4, 5, 6]
+  auto generate 2 by 3 matrix with all ones: A = ones(2, 3)
+    A = [1 1 1; 1 1 1]
+  auto generate 2 by 3 matrix with all twos: A = 2*ones(2, 3)
+    A = [2 2 2; 2 2 2]
+  auto generate 2 by 3 matrix of all random numbers between zero and one: A = rand(2, 3)
+    A = [0.13467 0.91234 0.34217; 0.23532 0.63491 0.49652]
+  auto generate identity matrix: A = eye(4)
+    A = [1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1]
+  get the size of matrix: size(A) %return [4 4] which itself is a 1 by 2 matrix
+  get the number of rows of matrix: size(A, 1) %return 4
+  get the number of columns of matrix: size(A, 2) %return 4
+  get the length of vector: length([1; 2; 3; 4; 5]) %return 5
+  slicing of matrix rows: v = priceY(1:10) %get first 10 rows for matrix priceY, start from row 1, end at row 10
+
+display histograms:
+  generate 1 by 10000 vector: v = -6 + sqrt(10) * rand(1, 10000);
+  hist() function displays histogram: hist(v);
+  histogram with more buckets: hist(w, 50);
+
+
+
+
+----------------------------------------------------------------------------------------------------------------
+computational operations
+----------------------------------------------------------------------------------------------------------------
+  matrix A multiply by matrix B: A * B
+  each element of A multiply by corresponding element of B: A .* B  % A and B need to be the same customize
+  element wise operation
+    square each element of A:   A .^ 2
+    divide each element of A:   A ./ 2
+    inverse each element of A:  1 ./ A
+    log each element of A:      log(A)
+    exponential each element of A: exp(A)
+    absolute value of each element of A: abs(A)
+    negate each element of A: -A  % same as: -1 * V
+    increase each element by 1: A + 1 % same as: A + ones(length(A), 1)
+    transpose A: A' % (A')' get back A
+    get the max element of A: max(A) % default to return column wise max
+    get the max element of entire matrix: max(max(A))
+    get the max value and the index of A: [val, ind] = max(A) % if A has more than one columns, returns column wise maximum
+    column wise max of A: max(A, [], 1)
+    row wise max of A: max(A, [], 2)
+
+    create n by n matrix that all rows, all columns, all diagonals add up to same number: magic(n) %not used in AI/ML
+
+    comparing each element to a number: A < 3 %return 1 or 0 if true or false for each element
+    find the index of elements that are less then a number: find( A < 3 )
+    return row r and column c of elements that are greater than or equal to number: find ( A >= 7)
+    sum all elements of A: sum(A) %default to columns wise sum
+    column wise sum of A: sum(A, 1)
+    row wise sum of A: sum(A, 2)
+    diagonal wise sum of A = magic(n): sum( sum( magic(n) .* eye(n) ) ) % first sum of columns, second sum of whole matrix
+    another diagonal wise sum of A = magic(n): sum( sum( magic(n) .* flipud(eye(n)))) %flipud = flip upper part down and down part up
+    multiply all elements of A: prod(A)
+    rounds down each element of A: floor(A)
+    rounds up each element of A: ceil(A)
+    find the psuedo-inverse of A: pinv(A)
+
+----------------------------------------------------------------------------------------------------------------
+plotting data
+----------------------------------------------------------------------------------------------------------------
+  plotting data give you idea how to improve the leaning algorithm
+    example data
+      t = [0 : 0.1 : 0.98]  %generate a vector from 0 up to 0.98
+      y1 = sin(2 * pi * 4 * t)
+      plot(t, y1) %horizontal axis is t and vertical axis is y1
+      y2 = cos(2 * pi * 4 * t)
+      plot(t, y2) %Octave replaces the sin graph with the cos graph
+
+    plot cos on top of sin
+      plot(t, y1);
+      hold on;  %hold on allows Octave to plot new graph on top of old graph
+      plot(t, y2, 'r'); %third parameter 'r' specify the color of new graph
+
+    label the axis
+      xlabel('time')  % x axis with label 'time'
+      ylabel('value') % y axis with label 'value'
+      legend ('sin', 'cos') % adds sin and cos on the upper right corner
+      title('my plot')  % add title for the graph
+      print -dpng 'myPlot.png';   % save the graph in current directory
+
+
+    display two graph at the same time
+      figure(1); plot(t, y1); % figure 1 will be displayed in one window
+      figure(2); plot(t, y2); % figure 2 will be displayed in another window
+      subplot(1, 2, 1); % divides plot a 1 x 2 grid ( first two parameter), access first grid (third parameter)
+      pot(t, y1); % displays sin graph in the first grid
+      subplot(1, 2, 2); % divides plot a 1 x 2 grid ( first two parameter), access second grid (third parameter)
+      pot(1, y2); % display cos graph in the second grid
+      axis([0.5 1 -1 1]); % change the axis ranges for the second grid, 0.5 to 1 for x, and -1 to 1 for y
+
+    close and clear figures
+      close;  % close the graph screen window
+      clf;    % empty the graph window, but the window is still there
+
+    display matrix in color grid
+      A = magic(5);
+      imagesc(A); % colorful graph
+      imagesc(A), colorbar, colormap gray;  % gray graph
+
+    use comma to separate commands on the same line
+      a = 1, b = 2, c = 3  % execute three commands setting variable a, b, c and print out results
+      a = 1; b = 2; c = 3; % also execute three commands setting variable a, b, c but do NOT print out results
+
+
+----------------------------------------------------------------------------------------------------------------
+plotting data
+----------------------------------------------------------------------------------------------------------------
+  
