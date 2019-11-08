@@ -1,0 +1,55 @@
+AWS Regions
+  AWS has regions all around the world
+    example: us-east-1
+
+  each region has minimum of 3 availability zones (AZ)
+    AZ name adds letter after region name, letter a - f
+        example: us-east-1a, us-east-1b
+    global-infrastructure page shows the different regions
+      and number of AZ inside each region
+
+  each AZ is a physical data center in the region
+    but separate from each other so that they are isolated from disasters
+
+  ** AWS console are region scoped
+    * except IAM and S3, they are global services
+    * console actions are performed to the selected region
+
+IAM
+  Identity Access Management
+    ** root account should never be used and shared
+      use MultiFactorAuthentication(MFA) to protect root account
+
+    create IAM users
+      log in as IAM users
+
+    create groups with attached policies
+      assign users to groups and users will inherit group policies
+
+    users must be created with proper permissions
+      give users the minimum permissions for doing their job
+
+  IAM manages AWS security
+      users
+        physical person
+      groups
+        group contains users
+          by function: admins, devops
+          by teams: engineering, design
+        users will inherit permissions applied to groups
+      roles
+        internal usage within AWS resources
+          roles are for machines and applications, NOT for physical person
+
+  policies defines what users, groups, roles can and cannot do
+    policies are written in JSON
+    IAM has predefined policies
+
+  ** IAM has global view
+    users, groups and roles created will be across all regions
+
+  IAM federation
+    big enterprises usually integrate their own repository of users with IAM
+      one can login to AWS using their company credentials
+      identity federation use SAML standard
+        example: MicroSoft Active directory

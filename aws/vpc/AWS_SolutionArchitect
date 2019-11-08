@@ -1,0 +1,61 @@
+VPC
+  VPC lets you provision a logically isolated section of the AWS Cloud
+    you can launch AWS resources in a virtual network that you define
+      ec2 instances
+      routers
+      route tables
+      internet gateways
+    you have complete control over your virtual networking environment
+      selection of your own ip address range
+      creation of subnet
+      configuration of route tables and network gateways
+    you can customize the network configuration for your VPC
+      public-facing subnet for your web server
+      private-facing subnet for your databases
+    you can leverage multiple layers of security
+      security groups
+      network ACL
+
+VPC with public & private subnets
+  EC2 instance is inside Subnet; Subnet is inside VPC; VPC is inside a region
+  Internet gateway -> router -> router table -> network ACL -> subnet -> security group -> EC2 instances
+    network ACL are stateless
+    defines allow rule and deny rule
+
+range of private subnet address
+  10.0.0.0    - 10.255.255.255  (10/8 prefix)
+  172.16.0.0  - 172.31.255.255  (172.16/12 prefix)
+  192.168.0.0 - 192.168.255.255 (192.168/16 prefix)
+  * The largest subnet in Amazon is  /16
+  * The smallest subnet in Amazon is /28
+
+what can we do with a VPC
+  launch instances into a subnet of your choosing
+  assign custom IP address ranges in each subnet
+  configure route tables between subnets
+  create internet gateway and attach it to our VPC
+  much better security control over your AWS resources
+  instance security groups
+  subnet network access control lists (ACLS)
+
+default VPC vs Custom VPC
+  default VPC is user friendly, allowing you to immediately deploy instances
+  all subnets in default VPC have a route out to the Internet
+  each EC2 instance has both a public and private IP address
+
+VPC Peering
+  allows you to connect one VPC with another via a direct network route using private ip addresses
+  instances behave as if they were on the same private network
+  you can peer VPCs with other AWS accounts as well as with other VPCs in the same accounts
+  peering is in a star configuration: i.e. 1 central VPC peers with 4 others
+    *NO TRANSITIVE PEERING!
+  you can peer between regions
+
+Exam Tips
+  think of VPC as a logical data center in AWS
+  consists of IGWs (or virtual private gateways), route tables, network ACLs, subnets, and security groups
+  * 1 subnet = 1 availability zone
+    1 subnet CANNOT across multiple availability zones
+    multiple subnets can be inside the same availability zone
+  security Groups are stateful; network Access Control Lists are stateless
+  NO TRANSITIVE PEERING
