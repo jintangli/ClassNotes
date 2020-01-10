@@ -1,0 +1,7 @@
+Introduction to BGP
+  design as an Exterior Gateway Protocol
+    The only Exterior Gateway Protocol currently available
+  Advertises, learns, and chooses the best path inside the global internet
+    learning massive quantity of internet routs that are unable to handle by interior routing protocols
+      EIGRP and OSPF cannot handle more than 4,000 routes
+    

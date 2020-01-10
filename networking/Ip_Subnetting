@@ -1,0 +1,24 @@
+Class       Ranges            CIDR(Default Mask)      private
+A           1   - 126         /8                      10.0.0.0   - 10.255.255.255
+
+B           128 - 191         /16                     172.16.0.0 - 172.31.255.255 
+
+C           192 - 223         /24
+
+D           224 - 239         N/A
+
+E           240 - 255         N/A
+--------------------------------------------------------------------------------
+* class D is for multi-casting
+* class E is for experimental
+
+Ranges
+  Ranges are in the first Octave
+    Ip4 are classified by the first Octave
+  0 is reserved for the universal gateway
+  127 is reserved for loop back
+
+CIDR
+  CIDR has nothing to do with the class
+    class is defined by Ranges
+    class A can have CIDR /16, the default CIDR is /8

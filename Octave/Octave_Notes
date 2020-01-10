@@ -228,4 +228,29 @@ control statements: for, while, if
                                           y1 = x^2;
                                           y2 = x^3;
     call function and save it into variable: [a, b] = squareAndCubeThisNumber(5)  % a is 25 and b is 125
-    
+
+    define the cost function
+      function J = costFunctionJ(X, y, theta)
+        % X is the "design matrix" containing our training example
+        % y is the class labels
+        m = size(X, 1);  % number of training examples
+        predictions = X * theta;  % predictions of hypothesis on all m examples
+        sqrErrors = (predictions - y ).^2;  % square errors
+        J = 1/(2*m) * sum(sqrErrors);
+
+
+Vectorization
+
+
+
+
+
+
+
+
+
+
+
+
+
+v
