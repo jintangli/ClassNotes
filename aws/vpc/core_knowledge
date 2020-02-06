@@ -1,0 +1,82 @@
+vpc Introduction
+
+    what vpc
+        an isolated environment in AWS that is dedicated to an user
+            each vpc is logically isolated from other vpc
+        user has full control over resources hosted inside vpc
+    vpc is region specific
+        vpc cannot span more than one regions
+        vpc can span more than one availability zones in the same region
+    vpc contains subnets
+        one subnet cannot span more than one availability zones
+        one availability zone can have more than one subnets
+
+    vpc components
+        CIDR and ip addresses for subnets
+            10.0.0.0/8
+            172.16.0.0/12
+            192.168.0.0/16
+            *AWS supports minimum /28 and maximum /16
+        implied router
+            created by AWS by default
+            allow subnets communicate with each other and go out to internet
+        route tables
+            used by implied router to route packets
+            evaluated from top to bottom
+        internet gateway (IGW)
+            allow vpc communicate with internet
+        security groups
+            function in the virtual nic level
+            virtual firewall protecting EC2 instances
+            *security groups are stateful
+        network access control list (NACL)
+            function in the subnet level
+            first line of defense in vpc, protecting subnets
+            *NACL are NOT stateful
+        virtual private gateway (VGW)
+            for communication between AWS and on premise datacenter
+
+##
+implied routers and route tables
+
+    implied router
+        central routing function within vpc
+            connects different subnets
+                communication within vpc
+            connects vpc with IGW
+                communication with internet
+            connects vpc with VGW
+                communication with on premise datacenter
+
+    route tables
+        define rules forwarding traffics within vpc
+            AWS create main route table by Default
+            user create custom route tables
+            up to 200 tables per vpc
+
+        each subnet MUST be associated with only one route table
+            route table has entries define forwarding rules
+            up to 50 entries per route table
+
+        subnet will associate with main route table if not specify
+            can change subnet to associate with another route table
+
+        main route table can be edited but NOT deleted
+            can add or remove entries in main route table
+            can set custom route table become main route table
+
+        every route table comes with default route
+            default route allows vpc subnets to communicate with each other
+            can NOT edit or delete this default route
+
+
+##
+ip addressing
+
+    cannot change CIDR block range after vpc is created
+        can expand existing vpc by adding secondary CIDR block
+            new entry will add to each routable for this new CIDR block
+            new CIDR block cannot overlap with existing CIDR block
+
+    *different subnets within a vpc cannot overlap
+        

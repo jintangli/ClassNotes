@@ -1,7 +1,22 @@
 Introduction to BGP
-  design as an Exterior Gateway Protocol
-    The only Exterior Gateway Protocol currently available
-  Advertises, learns, and chooses the best path inside the global internet
-    learning massive quantity of internet routs that are unable to handle by interior routing protocols
-      EIGRP and OSPF cannot handle more than 4,000 routes
-    
+    design as an Exterior Gateway Protocol
+        The only Exterior Gateway Protocol currently available
+    advertises, learns, and chooses the best path inside the global internet
+        learning massive quantity of internet routs that are unable to handle by interior routing protocols
+            EIGRP and OSPF cannot handle more than 4,000 routes
+    ISPs typically use BGP to exchange routing information between themselves
+    can also be used for very large enterprise networks
+        enterprise network can have large numbers of subnets that EIGRP or OSPF cannot handle
+        run BGP in the core routers of enterprise networks
+    Enterprises sometimes use BGP to exchange routing info with one or more ISPs
+        when enterprise have offices scatter around the globe using different ISPs
+    BGP has robust best-path algorithm
+        BGP check more to decide the best path
+            the best path is selected based on multiple criteria
+        **because of this complex and robust best-path algorithm,
+            different attributes of BGP can be changed,
+            according to design needs,
+            to influence the selection of the best path.
+            JTL: BGP gives user more control in setting which route will be the best path, ASW direct connect uses this feature of BGP
+            JTL: This feature makes BGP keep only one best route for each prefix (not impossible but hard to have more then one)
+            
