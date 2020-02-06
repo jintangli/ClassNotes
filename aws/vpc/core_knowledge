@@ -79,4 +79,27 @@ ip addressing
             new CIDR block cannot overlap with existing CIDR block
 
     *different subnets within a vpc cannot overlap
-        
+
+    aws reserves 5 ip addresses in each subnet
+        first 4 and last one are reserved
+            fist ip is the base network
+            second ip is the router
+            third ip is DNS related
+            forth ip is reserved for future
+            last ip cannot be used
+
+##
+internet gateway(IGW)
+
+    vpc communicate with internet through IGW
+        supports both ip v4 and v6
+
+    horizontally scale, redundant and highly available
+        *IGW is completely provision aws services
+            users do not need to manage it
+
+    IGW performs NAT between your private and public ip v4 addresses
+        EC2 instances public ips are configured in IGW and translated into private ips
+            *public ips are not on EC2 instances
+
+    
