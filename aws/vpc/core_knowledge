@@ -102,4 +102,53 @@ internet gateway(IGW)
         EC2 instances public ips are configured in IGW and translated into private ips
             *public ips are not on EC2 instances
 
-    
+##
+vpc types
+    default vpc
+        created in each region when an AWS account is created
+        has default CIDR, security group, NACL, and route table
+        has an IGW
+
+    custom vpc
+        created by AWS account owner
+        user chooses CIDR block
+        has its own security group, NACL, and route table
+        does NOT have an IGW
+
+
+ ##
+ security groups
+    virtual firewall functioning at the ENI of an EC2 instance
+        up to 5 security group per instance
+    has inbound direction and outbound direction
+    *cannot share across vpc
+    ** stateful
+    ** can only have PERMIT rules, can NOT have deny rules
+    ** every thing is DENY by default
+    ** changes make to security group will be effect immediately
+
+    default security group for default/custom vpc
+        inbound
+            all allow source from same security group
+        outbound
+            all allow
+    custom security group for default/custom vpc
+        inbound
+            all deny
+        outbound
+            all allow
+
+
+##
+create custom vpc
+    custom vpc does not have default
+        IGW
+            no public ip address for ec2 instance
+        subnet
+
+    custom vpc has default
+        NACL
+        security group
+        route table
+            with default route for traffic within vpc
+            new subnets does NOT associate with this route table
