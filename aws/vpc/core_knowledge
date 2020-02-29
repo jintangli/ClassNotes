@@ -13,10 +13,10 @@ vpc Introduction
 
     vpc components
         CIDR and ip addresses for subnets
+            *AWS supports minimum /28 and maximum /16
             10.0.0.0/8
             172.16.0.0/12
             192.168.0.0/16
-            *AWS supports minimum /28 and maximum /16
         implied router
             created by AWS by default
             allow subnets communicate with each other and go out to internet
@@ -141,14 +141,22 @@ vpc types
 
 ##
 create custom vpc
-    custom vpc does not have default
+    custom vpc NOT include default
         IGW
             no public ip address for ec2 instance
         subnet
+            custom subnets do NOT auto assign public IP
+            default subnets auto assign public IP
 
-    custom vpc has default
+    custom vpc include default
         NACL
         security group
         route table
-            with default route for traffic within vpc
-            new subnets does NOT associate with this route table
+            **any route table, default or custom, has default route for traffic within vpc
+                **this default route can NOT be removed
+                **ec2 instances within vpc should *always be able to communicate with each other
+
+            new subnets associate with this route table by default
+                subnets can change route table association
+                one subnet can only associate with one route table
+            
