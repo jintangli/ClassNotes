@@ -25,6 +25,8 @@ vpc Introduction
             evaluated from top to bottom
         internet gateway (IGW)
             allow vpc communicate with internet
+            ** host all the Elastic Network IP(ENI)
+            ** NAT the ENI to a private IP associated with ec2 instance
         security groups
             function in the virtual nic level
             virtual firewall protecting EC2 instances
@@ -50,13 +52,14 @@ implied routers and route tables
 
     route tables
         define rules forwarding traffics within vpc
-            AWS create main route table by Default
+            **AWS create main route table by Default
+                **for both default and custom vpc
             user create custom route tables
-            up to 200 tables per vpc
+                up to 200 tables per vpc
 
         each subnet MUST be associated with only one route table
             route table has entries define forwarding rules
-            up to 50 entries per route table
+                up to 50 entries per route table
 
         subnet will associate with main route table if not specify
             can change subnet to associate with another route table
@@ -65,9 +68,9 @@ implied routers and route tables
             can add or remove entries in main route table
             can set custom route table become main route table
 
-        every route table comes with default route
-            default route allows vpc subnets to communicate with each other
-            can NOT edit or delete this default route
+        **every route table comes with default route
+            **default route allows vpc subnets to communicate with each other
+            **can NOT edit or delete this default route
 
 
 ##
@@ -120,35 +123,77 @@ vpc types
  security groups
     virtual firewall functioning at the ENI of an EC2 instance
         up to 5 security group per instance
-    has inbound direction and outbound direction
-    *cannot share across vpc
+
+    ** has inbound direction and outbound direction
+        inbound rules required resource
+            ip range, security groups
+        outbound rules required destination
+            ip range, security groups
+
+    ** can be shared within vpc but cannot share across vpc
     ** stateful
     ** can only have PERMIT rules, can NOT have deny rules
     ** every thing is DENY by default
     ** changes make to security group will be effect immediately
 
-    default security group for default/custom vpc
-        inbound
-            all allow source from same security group
-        outbound
-            all allow
-    custom security group for default/custom vpc
-        inbound
-            all deny
-        outbound
-            all allow
+    **** default rules in default security group can be CHANGED
+        ** default security group for both *default and *custom vpc
+            ** inbound
+                all allow source from same security group
+            ** outbound
+                all allow
+        ** custom security group for default/custom vpc
+            ** inbound
+                all deny
+            ** outbound
+                all allow
+
+    must specify security group while creating ec2 instance
+        this is the default security group
+            **CANNOT delete the default security group
+
+
+## network access control list (NACLs)
+    ** performed in the implied router
+        implied router hosts NACL function
+
+    ** function in the subnet level
+
+    ** NACL is stateless
+
+    ** rules must be explicit
+        can have PERMIT and DENY rules in a NACL
+
+    ** end with explicit deny any
+        ** cannot delete this rule
+
+    ** NACL is a set of rules
+        ** each has a number
+            check for a PERMIT from the lowest number
+            until explicit/implicit deny is reach
+        ** can INSERT between rules
+            leave number range between two rules
+
+    ** subnet must associate with NACL
+        ** associate with default NACL if not specified
+
+    ** default NACL for default/custom vpc ALLOWS ALL traffics by default
+        inbound: allow
+        outbound: allow
+    ** custom NACL for default/custom DENY ALL traffic by default
+        inbound: deny
+        outbound: deny
 
 
 ##
 create custom vpc
-    custom vpc NOT include default
+    custom vpc NOT include
         IGW
             no public ip address for ec2 instance
         subnet
             custom subnets do NOT auto assign public IP
-            default subnets auto assign public IP
 
-    custom vpc include default
+    custom vpc include
         NACL
         security group
         route table
@@ -158,5 +203,13 @@ create custom vpc
 
             new subnets associate with this route table by default
                 subnets can change route table association
-                one subnet can only associate with one route table
-            
+
+
+##
+security group format
+    inbound:    type, protocol, port_range, source
+    outbound:   type, protocol, port_range, destination
+
+NACL
+    inbound:    rule#, type, protocol, port_range, source,      allow/deny
+    outbound:   rule#, type, protocol, port_range, destination, allow/deny 
