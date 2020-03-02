@@ -212,4 +212,27 @@ security group format
 
 NACL
     inbound:    rule#, type, protocol, port_range, source,      allow/deny
-    outbound:   rule#, type, protocol, port_range, destination, allow/deny 
+    outbound:   rule#, type, protocol, port_range, destination, allow/deny
+
+
+##
+NAT
+    NAT instance
+        ec2 instance running special AMI
+        ** hosted in public subnet
+            ** need to assign security group
+        ** configured private subnet route table
+            add rule routing all outbound traffic to NAT instance
+
+    private subnet ec2 instance need to be able to update software
+        Access websites in the internet (http or https)
+
+    NAT instance security group must allow
+        traffic inbound from private subnet on port 80(http) or 443(https)
+        traffic outbound to internet on port 80(http) or 443(https)
+        traffic inbound from customer's own network on port 22(ssh)
+
+    ** NAT instance must disable source destination check
+        ec2 instance enable source destination check by Default
+            meaning ec2 instance only allow traffic coming from and to itself
+            
