@@ -235,4 +235,35 @@ NAT
     ** NAT instance must disable source destination check
         ec2 instance enable source destination check by Default
             meaning ec2 instance only allow traffic coming from and to itself
-            
+
+##
+vpc peering
+    networking connection between two vpcs
+        open routing path between two vpcs for data communication
+        enables routing traffic between them using PRIVATE ipv4 addresses or ipv4 addresses
+        ec2 instances can communicate with each other as if they are from SAME network
+        vpcs can be from the same account or from different account
+        vpc peering is provision by aws
+            fault tolerance, high availability, low latency, no single point of failure
+
+    aws uses existing infrastructure of a vpc to create vpc peering
+        not using gateway
+        not using vpn connection
+        not rely on separate piece of physical hardware
+
+    ** enable flow of traffic between vpcs
+        ** add route to route tables that point to the IP ADDRESS RANGES of peer vpc
+        ** update security groups to ensure traffic to and from peer vpc is not restricted
+
+
+    restrictions:
+        cidr block from vpc_1 and vpc_2 should not overlap
+        vpc_1 and vpc_2 do NOT need to be in the same region
+        one vpc need to initiate the peering request
+            another vpc need to accept the peering request
+            50 active peering connection
+            25 pending peering connection
+        ** vpc peering is a one to one connection between two vpcs
+        ** transitive peering relationships are NOT supported
+            ** can NOT having any peering relationship with vpcs that are not DIRECTLY peer with
+                ** edge to edge routing is NOT allow
