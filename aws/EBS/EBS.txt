@@ -1,0 +1,30 @@
+each EBS volume is replicated within its AZ
+
+EBS volume must be in the same AZ as EC2 instance
+
+by default, root EBS volume will be deleted when EC2 instance is terminated
+
+by default, additional EBS volume will NOT be deleted when EC2 instance is terminated
+
+volume size can be modified (increase/decrease) on the fly while the EC2 instance is running
+
+volume type can be changed (upgrade/downgrade) on the fly while the EC2 instance is running
+	even for the root volume
+	
+moving root volume to another AZ
+	1. create a snapshot of the volume
+	2. create an image out of the snapshot, use HVM which has more instance types supported
+	3. launch the new instance in a new AZ using the new image
+	4. can also copy the AMI into another region and launch new instance in that new region
+		need to copy AMI to another region, AMI is regional
+	
+snapshots exist on S3, snapshots are incremental
+	can take snapshot while the instance is running
+	best practice to stop the instance before taking the snapshot
+
+select AMI based on: 
+	region, operating system, architecture, launch permission, root device volume
+	
+all AMIs are categorized as either 
+	backed by Amazon EBS 
+	backed by instance store
