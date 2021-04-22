@@ -267,3 +267,40 @@ vpc peering
         ** transitive peering relationships are NOT supported
             ** can NOT having any peering relationship with vpcs that are not DIRECTLY peer with
                 ** edge to edge routing is NOT allow
+
+
+##
+transit gateway
+    vpc peering is not transitive
+        need full mesh among the vpcs
+            (n-1).n/2 vpc peering for n vpcs
+
+    ** transit gateway is a network transit hub
+        ** use to interconnect vpcs and on-premises networks
+        ** it is a regional resource
+        ** vpcs are allowed to communicate with one another and with on-premises by default
+            ** this can be changed by creating different routing tables
+            ** associate different vpcs with different route tables to control who can talk to who
+        ** transit gateway can associated across accounts
+        ** transit gateway exposes two internet routable ips for vpn termination
+            on-premise datacenter can connect to transit gateway
+
+    ** attachment
+        vpc, direct connect gateway, vpn can be attached to a transit gateway
+
+    ** transit gateway route table
+        has a default route table and can optionally have additional route tables
+            ** include dynamic and static routes that decides the next hop based on destination ip
+            ** target of route can be vpc or vpn connection
+            ** by default, the vpc and vpn connections that are attached to a transit gateway
+                ** are associated with the default transit gateway route table
+
+    ** association
+        each attachment is associated with exactly one route table
+        each route table can associate with zero to many attachment
+
+    ** route propagation
+        vpc or vpn connection can dynamically propagate routes to a transit gateway route table
+        for vpc, must create static route to send traffic to the transit gateway
+        for vpn connection, routes are propagated from transit gateway to on-premise router using BGP
+        
