@@ -1,0 +1,15 @@
+aws exam tips:
+    * looking at the services in the question, think about whether the service is
+        globally nature
+            route 53, IAM
+        regional nature
+            s3
+        zone nature
+            EBS
+
+    * when designing systems on platform, think about the benefits offered by the platform
+        security
+
+        durability
+
+        availability
