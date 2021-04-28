@@ -1,0 +1,18 @@
+Routet53 is a *Global service
+
+Routet53 is a Managed DNS service
+	A     : host name to IPv4
+	AAAA  : host name to IPv6
+	CNAME : host name to host name
+	Alias : host name to AWS resource
+	
+Routet53 can use
+	public domain names you own/buy
+	private domain names that can be resolved by your instances in your VPCs
+	
+Routet53 has advanced features:
+	load balancing (aka: client load balancing)
+	health checks
+	routing policy: simple, failOver, geoLocation, latency, weighted, multiValue
+	
+ 
