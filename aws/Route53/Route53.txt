@@ -16,3 +16,40 @@ Routet53 has advanced features:
 	routing policy: simple, failOver, geoLocation, latency, weighted, multiValue
 	
  
+DNS records TTL
+	web browser will cache DNS record for TTL duration
+
+CNAME vs Alias
+	*AWS resources (loadBalancer, CloudFront...) expose AWS hostname
+		ex: lbl-1234.us-east-2.elb.amazonaws.com
+	
+	CNAME points a hostname to any other hostname
+		Only works for *NON-Root Domain
+			ex: app.mydomain.com => xxx.yyy.com
+		
+	Alias points hostname to an *AWS resource
+		works for *Root domain and NON-Root domain
+			ex: mydomain.com => xxx.amazonaws.com
+		
+Routing policy
+	simple
+		use when need to redirect to a resource
+		*cannot attach health checks to simple routing policy
+		if *multiple values are returned, client choose a random one
+		
+	weighted
+		control the percentage of the requests that go to specific endpoint
+			create *multiple weighted record sets, specify weighted percentage in each of them
+		can attach health checks
+		*helpful to split small traffic to test new app version
+		*helpful to split traffic between two regions
+		
+	latency
+		redirect to the server that has the least latency
+			create *multiple latency record sets, each of them need to be in *different region
+		latency is evaluated in terms of user to designated AWS *region
+		
+	
+	
+		
+	
