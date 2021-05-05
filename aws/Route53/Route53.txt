@@ -33,11 +33,13 @@ CNAME vs Alias
 		
 Routing policy
 	simple
+		create *one record set pointing to multiple instances
 		use when need to redirect to a resource
 		*cannot attach health checks to simple routing policy
 		if *multiple values are returned, client choose a random one
 		
 	weighted
+		create multiple record sets with the same name
 		control the percentage of the requests that go to specific endpoint
 			create *multiple weighted record sets, specify weighted percentage in each of them
 		can attach health checks
@@ -45,11 +47,54 @@ Routing policy
 		*helpful to split traffic between two regions
 		
 	latency
+		create multiple record sets with the same name
 		redirect to the server that has the least latency
 			create *multiple latency record sets, each of them need to be in *different region
 		latency is evaluated in terms of user to designated AWS *region
 		
+	failOver
+		create two record sets with the same name
+		two instances 
+			only one primary and only one secondary
+		health check is mandatory for *primary instance
+			associate with health check when creating record set
+		if primary instance fails health check, then failOver to secondary
+		
+	Geolocation
+		routing based on user location
+			create multiple record sets with the same name
+			specify that traffic from certain location should go to this specific IP
+				ex: from traffic from China goes to IP that hosts the Chinese version of the website
+			should have default policy in case there is no match location
+		
+	Geoproximity
+		route traffic to resources based on the geographic location of users and resource
+		ability to shift more traffic to resources based on the defined bias
+			more traffic will go to instance with higher defined bias
 	
+	multi values
+		create multiple record sets with the same name
+		similar to simple routing policy with some improvement
+		routing traffic to multiple resources
+			up to 8 *healthy records are return
+		*associate health checks with Route53 record
+		
+		
+health checks
+	Route53 will not send traffic to unhealthy instances
+		unhealthy if instance fails 3 health checks in a row
+		healthy if instance passes 3 health checks in a row
+		default health check interval is 30 second
+		15 health checkers will check the endpoint health
+		
+
+3rd party domains and Route53
+	Route53 is also a domain name registrar
+		domain name registrar is an organization that manages the reservation of internet domain names
+	if you buy your domain on 3rd party website, you can still use Route53
+		create a hosted zone in Route53
+		update name server records on 3rd party website to use Route53 name servers
 	
+		
 		
 	
