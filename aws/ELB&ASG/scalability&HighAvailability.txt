@@ -14,16 +14,102 @@ High Availability
 		
 		
 Elastic Load Balancer
-	forward internet traffic to multiple servers/ec2 instance
-		load balancer is the *single point of entry (DNS) for user
+	forward Internet traffic to multiple servers/ec2 instance
+		load balancer is the *single point of entry for user
 			requests go through load balancer to ec2 instance
 			response go through load balancer to user
 			
-		ec2 instances can scale in/out in the back end
-			spread load across multiple downstream instances
-			seamlessly handle failures of downstream instances
+	why use a load balancer	
+		spread load across multiple downstream instances
+		expose a single point of access (DNS) to your application
+		seamlessly handle failures of downstream instances
+		do regular health checks to your instance
+		provide ssl termination (https) for your websites
+		enforce stickiness with cookies
+		high availability across zones
+			load balancer can be spread across multi AZ
+			ec2 instances can be spread across multi AZ
+		separate public traffic from private traffic
+			public: user to load balancer
+			private: load balancer to ec2 instances
+
+	ELB is a managed load balancer
+		aws takes care of upgrades, maintenance and configuration
+		cost less than setting up you own load balancer
+		integrated with *many aws offerings/services
+		can setup internal/private or external/public ELBs
+		
+		
+	health checks
+		enable load balancer to know if ec2 instance is available
+		is done on a part and a route (/health is common)
+			in configurable time intervals
+		instance is unhealthy if response is not 200
 			
+	types of load balancer on aws
+		classic load balancer (old generation)
+			http, https, tcp
+		application load balancer
+			http, https, webSocket
+		network load balancer
+			tcp, tls, udp
+			
+	*load balancer security groups
+		load balancer open to public
+			allow http from source: 0.0.0.0/0
+			allow https from source: 0.0.0.0/0
+		
+		ec2 instances/application open only to load balancer
+			allow http from source: load balancer security group ID
+		
+	*trouble shooting
+		4xx errors are client induced errors
+		5xx errors are application induced errors
+			*503 means load balancer at capacity or not registered target
+		*check security group if LB cannot connect to your application
+		
+	Monitoring
+		ElB access logs will log all access requests
+		cloudWatch metrics will give you aggregate statistics
+			ex: connection counts
 		
 		
-	
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
