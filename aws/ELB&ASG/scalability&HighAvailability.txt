@@ -1,0 +1,29 @@
+scalability 
+	application/system can handle greater loads by adapting
+		vertical scalability
+			common for non-distributed systems
+				RDS, ElastiCache
+		horizontal scalability
+			implies distributed systems with auto scaling group and load balancer
+				web applications, modern applications
+	
+
+High Availability
+	running application/system in at least 2 data centers / availability zones
+		can survive data center loss
+		
+		
+Elastic Load Balancer
+	forward internet traffic to multiple servers/ec2 instance
+		load balancer is the *single point of entry (DNS) for user
+			requests go through load balancer to ec2 instance
+			response go through load balancer to user
+			
+		ec2 instances can scale in/out in the back end
+			spread load across multiple downstream instances
+			seamlessly handle failures of downstream instances
+			
+		
+		
+	
+		
