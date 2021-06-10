@@ -1,7 +1,7 @@
 scalability 
 	application/system can handle greater loads by adapting
 		vertical scalability
-			common for non-distributed systems
+			*common for non-distributed systems
 				RDS, ElastiCache
 		horizontal scalability
 			implies distributed systems with auto scaling group and load balancer
@@ -9,12 +9,12 @@ scalability
 	
 
 High Availability
-	running application/system in at least 2 data centers / availability zones
+	running application/system in at least 2 data centers/availability zones
 		can survive data center loss
 		
 		
 Elastic Load Balancer
-	forward Internet traffic to multiple servers/ec2 instance
+	forward Internet traffic to multiple ec2 instances
 		load balancer is the *single point of entry for user
 			requests go through load balancer to ec2 instance
 			response go through load balancer to user
@@ -23,11 +23,10 @@ Elastic Load Balancer
 		spread load across multiple downstream instances
 		expose a single point of access (DNS) to your application
 		seamlessly handle failures of downstream instances
-		do regular health checks to your instance
+		do regular health checks to ecs instances
 		provide ssl termination (https) for your websites
 		enforce stickiness with cookies
 		high availability across zones
-			load balancer can be spread across multi AZ
 			ec2 instances can be spread across multi AZ
 		separate public traffic from private traffic
 			public: user to load balancer
@@ -42,7 +41,7 @@ Elastic Load Balancer
 		
 	health checks
 		enable load balancer to know if ec2 instance is available
-		is done on a part and a route (/health is common)
+		is done on a port and a route (/health is common)
 			in configurable time intervals
 		instance is unhealthy if response is not 200
 			
@@ -74,8 +73,45 @@ Elastic Load Balancer
 			ex: connection counts
 		
 		
+classic load balancer
+	
+	sticky session
+		enable users to stick to the same ec2 instance.
 		
+	cross zone load balancing
+		enable to balance load across multiple availability zones
 		
+	path based routing
+		create a listener with rules to forward requests based on the url path	
+			route traffic to different back-end micro-services using path-based routing
+			
+auto scaling
+	
+	groups
+		logical component: webserver group, application group, database group
+		
+	configuration templates
+		templates for launching ec2 instances in a group
+			configuration templates = AMI + instance_type + key_pair + security_groups + EBS + ....
+			
+	scaling options
+		ways to scale auto scaling groups	
+			
+	*five different scaling options		
+		maintain current instance levels at all times
+			performs periodic health check on running instances
+			terminate unhealthy instances and launches a new one
+		scale manually
+			user specify changes in the max, min or desired capacity
+			auto scaling group manages the process of creating or terminating instances to maintain the updated capacity
+		scale based on a schedule
+			scaling actions performed automatically at schedule time
+		scale based on demand
+			using scaling policy which defines parameters that control the scaling process
+				example parameters: cpu utilization
+		use predictive scaling, *new feature
+			combining predictive scaling and dynamic scaling to maintain optimal availability and performance
+	
 		
 		
 		
