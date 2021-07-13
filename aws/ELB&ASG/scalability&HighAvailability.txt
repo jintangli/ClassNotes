@@ -23,7 +23,7 @@ Elastic Load Balancer
 		spread load across multiple downstream instances
 		expose a single point of access (DNS) to your application
 		seamlessly handle failures of downstream instances
-		do regular health checks to ecs instances
+		do regular health checks to ec2 instances
 		provide ssl termination (https) for your websites
 		enforce stickiness with cookies
 		high availability across zones

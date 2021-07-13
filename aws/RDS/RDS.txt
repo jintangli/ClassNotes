@@ -1,0 +1,13 @@
+read replicas
+	read only copy
+	can cross region
+	asynchronous update
+	can be manually promoted to s standalone database
+	
+multi-AZ
+	single region, cross AZ
+	synchronous update
+	automatic failover
+	back up snapshot can be done from standby instance
+	standby instance cost the same as the primary
+	
