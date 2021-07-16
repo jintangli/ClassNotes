@@ -304,3 +304,11 @@ transit gateway
         for vpc, must create static route to send traffic to the transit gateway
         for vpn connection, routes are propagated from transit gateway to on-premise router using BGP
         
+
+		
+##
+vpc endpoint
+	create connection between vpc and aws managed resources
+		enable ec2 instances from private subnet to access resources like S3 
+		ec2 instance and s3 need to be in the same region
+		no charge for using vpc endpoint

@@ -1,13 +1,51 @@
+RDS overview
+	multi-AZ
+		standby instance in another availability zone
+	read replica
+		scalable reads and can be used as disaster recovery plan
+	auto backup
+		configurable schedule and configurable retention period
+	configurable storage
+		general purpose, provisioned IOPS, magnetic
+	IAM Authentication
+		useful for temporary access
+	cloudwatch logs
+		enhanced monitoring metrics
+
 read replicas
 	read only copy
 	can cross region
 	asynchronous update
 	can be manually promoted to s standalone database
 	
+	
 multi-AZ
 	single region, cross AZ
 	synchronous update
 	automatic failover
 	back up snapshot can be done from standby instance
-	standby instance cost the same as the primary
+	Double the cost because standby instance cost the same as the primary
+	
+backup and restore
+	automatic backups 
+		take a storage volume snapshot and store in S3 for duration of the retention period
+		enable by default, happen every 30 mins, retention period upto 35 days
+	manual snapshot
+		store in s3 until they are deleted
+		
+	
+		
+	
+	
+RTO and RPO
+	recovery point --------------------- disaster event -------------------- resume operations
+		data loss: the amount of time between last back up and the disaster event
+		down time: the amount of time between disaster and becoming fully operational 
+	
+	RTO	: recovery time objective
+		max amount of time the recovery process can take
+		
+	RPO : recovery point objective
+		max amount of data we afford to loss
+	
 	
