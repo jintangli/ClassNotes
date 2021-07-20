@@ -1,0 +1,45 @@
+security token service (STS)
+----------------------------
+	
+STS 
+	**provides temporary security credentials for accessing *aws resources 
+	is a global service
+	
+
+temporary credentials	
+	**basis for role and identity federation
+	configurable and limited lifetime
+		generated dynamically when requested
+		no need to distribute or embed long-term security credentials
+		no need to rotate or explicitly revoke them when no longer needed
+
+temporary credentials scenarios
+	identity federation
+		manage users in an *external system outside of aws
+		grant them access to your *aws resources
+	role assumption
+		manage access requests from within aws 
+		
+		
+identity Federation		
+	two types of id federation based on where the *external system resides	
+	
+	**Enterprise identity federation: single sign-on (SSO)
+		authenticate users in your organization's network without creating new aws identities for them
+			support Security Assertion Markup Language (SAML) 2.0
+			
+	**Web identity federation	
+		sign in using well-known **third party identity providers
+			Google, Facebook, Amazon or any OpenID Connect(OIDC)2.0 compatible providers
+			
+			
+role assumption
+	*role for cross-account access	
+		allow user from one account to access another account
+		**both accounts need to be in same organization
+		
+	*roles for amazon EC2
+		allow application running on EC2 to access aws resources
+		
+	other aws services
+		allow aws services to access aws resources

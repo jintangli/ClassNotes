@@ -1,0 +1,28 @@
+
+	OAuth2 
+		an open standard for authorization between various parties
+		for internet users to authorize websites to access their information on other websites
+		authorize with access token rather than credentials
+	
+	OpenID Connect (OIDC)
+		built on top of OAuth2
+		detail specification for identity
+			JWT, ID, Access Token, Refresh Token
+	 
+	
+cognito
+	handle authentication and identity 
+		managed user directory
+		hosted ui
+		standard tokens
+		federation
+		aws credentials
+	underlying protocols and standards
+		OAuth2, OIDC, JWTS
+		
+		
+		
+-------------------------------------------------------------------------------------------		
+
+			
+		
