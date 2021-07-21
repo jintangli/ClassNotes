@@ -33,10 +33,25 @@ backup and restore
 	manual snapshot
 		store in s3 until they are deleted
 		
+Monitoring in RDS
+	event and event notification
+		provide visibility into RDS activity, such as failover, configuration changes, or maintenance
+		integrates with SNS to provide event notification
 	
+	enhanced monitoring
+		access to real-time metrics from the **underlying OS using an agent
+			cloudwatch retrieve metrics from hypervisor not from OS
+			enhance monitoring can view *Free Memory, cloudwatch CANNOT
+		adjustable granularity down to one-second interval
+		
+	performance insights
+		provides insight into database load, wait events, top SQL, top hosts, top users
+		
 		
 	
+
 	
+-------------------------------------------------------------------------------------------------	
 RTO and RPO
 	recovery point --------------------- disaster event -------------------- resume operations
 		data loss: the amount of time between last back up and the disaster event
