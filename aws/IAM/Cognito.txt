@@ -1,4 +1,32 @@
+cognito
+-------
 
+cognito
+	provides authentication, authorization, and user management for *your web and mobile apps
+	users can sign in 
+		directly with a user name and password
+		through a third party such as Facebook, Amazon, Google or Apple
+
+		
+		
+two main components
+	user pools
+		provide authentication
+		user directories that provide sign-up and sign-in options for app users
+		
+	identity pools
+		provide authorization
+		grant users access to other *aws services
+			**federated authentication using STS in background
+				**cognito handles the aws STS calls for us
+
+
+
+
+
+
+
+underlying protocols and standards
 	OAuth2 
 		an open standard for authorization between various parties
 		for internet users to authorize websites to access their information on other websites
@@ -9,20 +37,20 @@
 		detail specification for identity
 			JWT, ID, Access Token, Refresh Token
 	 
+in summary, Cognito User Pools and Cognito Identity Pools encapsulate the functionality 
+which you would normally need to write yourself to go from a SAML provider to a user 
+database to a mapping of users to permissions to being able to retrieve AWS credentials 
+for those permissions. Instead of making auth calls to a SAML provider (or implementing your own auth), 
+implementing a user database, and then making AWS credentials for a user's privileges, 
+they allow you to configure a user pool to use a given provider (or Cognito's own auth), 
+point an identity pool at the user pool, and tell the identity pool what permissions members 
+of the user pool should have. All the rest is done in the background, for you.	
+
 	
-cognito
-	handle authentication and identity 
-		managed user directory
-		hosted ui
-		standard tokens
-		federation
-		aws credentials
-	underlying protocols and standards
-		OAuth2, OIDC, JWTS
 		
 		
 		
--------------------------------------------------------------------------------------------		
+	
 
 			
 		

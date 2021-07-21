@@ -3,15 +3,15 @@ security token service (STS)
 	
 STS 
 	**provides temporary security credentials for accessing *aws resources 
+	**basis for role and identity federation
 	is a global service
 	
 
 temporary credentials	
-	**basis for role and identity federation
 	configurable and limited lifetime
-		generated dynamically when requested
-		no need to distribute or embed long-term security credentials
-		no need to rotate or explicitly revoke them when no longer needed
+	generated dynamically when requested
+	no need to distribute or embed long-term security credentials
+	no need to rotate or explicitly revoke them when no longer needed
 
 temporary credentials scenarios
 	identity federation
@@ -30,7 +30,7 @@ identity Federation
 			
 	**Web identity federation	
 		sign in using well-known **third party identity providers
-			Google, Facebook, Amazon or any OpenID Connect(OIDC)2.0 compatible providers
+			support Google, Facebook, Amazon or any OpenID Connect(OIDC)2.0 compatible providers
 			
 			
 role assumption
@@ -43,3 +43,4 @@ role assumption
 		
 	other aws services
 		allow aws services to access aws resources
+			e.g. lambda to access S3
