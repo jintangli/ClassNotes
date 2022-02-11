@@ -1,0 +1,101 @@
+
+*all S3 resources are private by default
+	only resource owner can access the resource
+	owner grant access to others by writing policy
+
+resource policy
+	applied directly to resource
+
+user policy
+	applied directly to IAM users
+
+S3 has two types of resource policy
+	ACL
+		**grant basic read/write permissions on objects and buckets to aws accounts and predefined groups
+		
+	bucket policy
+		**grant find-grained permissions on objects and buckets to aws accounts ad IAM users
+			can grant to anyone (including anonymous users)
+		
+grant access to S3 through user policy
+	applied directly to users, groups or roles using aws IAM 
+		*grant user policy through IAM, NOT S3
+		*cannot be used to grant anonymous access since they applied directly to users
+		*cannot be applied to root user since this account is not an IAM user
+	
+cross account access
+	One aws account grants permissions to its resources to another aws account
+		**account A grant permissions to account B *via bucket policy
+			need to user bucket policy because user policy cannot applied to root user
+		**account B delegates permissions to an user via a user policy
+	
+	good for organizations with more than one accounts
+		grant permissions to view other accounts billing and logs
+		
+evaluating policies
+	bucket operation
+		same account access
+			*ALL policies are evaluated at the same time
+			*if there is a deny policy, then deny
+		
+		cross account access
+			*user account must first grant user permissions to the bucket via user policy
+			*bucket owner must grant user account access via bucket policy
+	
+	object operation
+		same account access
+			*ALL policies are evaluated at the same time
+			*if there is a deny policy, then deny
+		
+		cross account access
+			*user account must first grant user permissions to the bucket via user policy
+			*bucket owner must not explicitly deny access, *authorized by default
+			**object owner must grant user access(an additional step to evaluate the object policy)
+			
+which policy should I use?
+	prefer user policy or bucket policy
+		these two can grant much finer permissions than ACL
+	
+	*some companies prefer only user policy
+		**because they can keep all user policy in IAM
+			
+	**cases for using ACL
+		to manage access to objects *NOT owned by the bucket owner
+			**cannot use bucket policy on an object not owned by bucket owner
+			
+		to manage *INDIVIDUAL objects when permissions must vary between objects
+			easier to user ACI than bucket policy
+		
+		to grant permissions to the "S3 Log Delivery Group" on a bucket
+			one of the predefined groups
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		
