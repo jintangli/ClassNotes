@@ -1,0 +1,29 @@
+two ways to assign value to variable
+	x = 11
+	y <- "hi"
+	x.1 = 100
+	
+view value of variable
+	print(x)
+	x
+	or view it in the workspace in upper left 
+
+list all variables in workspace
+	ls()
+	
+remove a variable from workspace
+	rm(x)
+	
+arithmetic operations in R
+	add: x+y
+	subtract: x-y
+	multiply: x*y
+	divide: x/y
+	square: y^2
+	square root: sqrt(y)
+	log base 10: log(y)
+	log base 3: log2(y)
+	exponential: exp(y)
+	absolute: abs(y)
+	
+	
