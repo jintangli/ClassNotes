@@ -1,0 +1,206 @@
+02. Config Our Username and Email
+	Creating an account for git to show who made what changes
+		Change user name
+			Configure my settings: change my user.name to "Jin Li"
+			$ git config --global user.name "Jin Li"
+				config: updating the config file
+				--global: this user, *NOT the entire project
+		
+		Change email
+			Configure my settings: change my email to "jinli@berkeley.edu"
+			$ git config --global user.email "jinli@berkeley.edu"
+			
+		View all settings
+			Including the changes just made	
+			$ git config --list
+		
+		View only one setting
+			View only email
+			$ git config user.email
+			
+		Clear everything on the screan
+			$ clear
+			
+		Get the help menu
+			Get all commands listed
+			$ git help
+			
+			Look at specific command, for example "commit"
+			$ git help commit
+			
+
+03. Creating Repository
+	Create folder for project
+		Folder can be created any where in computer
+		
+	Tell git this folder is for the project
+		Find out current location first
+			$ pwd
+		Navigate to Home directory
+			$ cd ~
+		*Navigate to D drive
+			$ cd /D/
+		*Navigate to the folder for project
+			$ cd related_path_to_project
+		*Turn this folder into git project
+			$ git init
+			
+04. Commit
+	Do NOT touch the hidden .git file, git uses it to manage everything
+	
+	Tell git we made changes to our project
+		Add all changes to our project
+		$ git add . 
+			git will aware the changes we made 
+		
+		Commit these changes for git to keep track of them
+		$ git commit -m "This is our first commit"
+			Take a snap shot of the project at this point in time
+			Come back to it later if something goes wrong
+			
+
+05. Adding Files and the Commit log
+	*View commit history
+		$ git log 
+	
+	View commit from an auther
+		$ git log --author="Jin"
+	
+	*Find any new changes, compare repository with working copy of project
+		$ git status
+
+06. Git Workflow		
+	Different stage of file	
+		working copy --$ git add--> staging area --$ git commit--> repository
+	
+	Stage only ONE file
+		$ git add file_name
+		
+07. How to Edit Files
+	View all modified files
+		$ git status
+	
+	Add the modified files to staging area
+		$ git add modified_file_name
+	
+	Commit these files
+		$ git commit -m "messages and comments"
+
+08. Viewing the Changes That You Made
+	View the difference between working copy and the repository copy
+		$git diff
+			Red line shows what is in repository
+			Green line shows what is in working copy
+		
+09. Comparing the Staging Area with the Repository
+	Only shows the difference between working copy and repository
+	Will Not show the difference after adding the modified file into staging area
+		$ git diff
+		
+	*Compare the stage area with repository
+		$ git diff --staged
+	
+10. How to Delete Files
+	Remove file from BOTH repository and working directory
+		$ git rm file_name
+	
+	*Need to commit to delete the file from repository
+		$ git commit  -m "commit message"
+
+11. How to Move and Rename Files
+	Rename file in working directory, then add and remove, git takes it as rename in status
+		$ git add new-file-name
+		$ git rm  old-file-name
+		$ git status
+		$ git commit -m "renamed old-file-name to new-file-name"
+		
+	Easier way to rename file: rename BOTH working copy and repository copy
+		$ git mv old-file-name new-file-name
+	
+	Move file into new folder with new name: Both in working copy and repository copy
+		$ git mv old-file-name new-folder/new-file-name
+		$ git status
+		$ git commit -m "rename file and put in new directory"
+		
+		
+		
+		
+		
+	
+	
+		
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+		
+		
+
+	
+	
+		
+	
+	
+			
+		
+		
+		
+	
+	
+	
+	
+		
+		
+		
+		
+	
+			
+			
+		
+			
+		
+	
