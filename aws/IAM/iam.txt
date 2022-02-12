@@ -1,0 +1,115 @@
+two parts to permissions
+	specification
+		*define which entities are allowed to perform which actions on specific resources and under which condition
+		
+	enforcement
+		*for each request, the service or application evaluates the permissions that you defined to allow or deny access
+		
+PARC
+	Principal: the entity that is allowed or denied access
+	Action: type of access that is allow or denied
+	Resource: the amazon resources that action will act on
+	Condition: the condition that are valid under the access defined
+	
+	{
+	 "Statement":[{
+		"Effect": "effect",
+		"Principal": "principal",
+		"Action": "action",
+		"Resource": "resource",
+		"Condition": {
+		 "condition": {"key":"value"}
+		}
+	 }]	
+	}
+	
+**policy types - how they work together
+	**All access request start with deny
+		all request are deny by default
+		
+	if using service control policies: scp must allow
+		csp are for managing permissions across accounts
+		
+	if using permission boundaries: permission boundary must allow
+		permission boundaries are for defining max permission a roll can have
+	
+	if same account access: identity *OR resource policy must allow
+		only need one allow
+	
+	if direct cross account access: identity *AND resource policy must allow
+		need both allow
+		
+	if using session policy: session and identity policy must allow
+	
+	
+least privilege
+	the right access
+		to the right things
+			at the right time
+				to do the right job
+					and nothing more
+
+least privilege framework
+	first setting up the permission boundaries and permission guardrails
+		for cross accounts
+	fine-grained permission at scale
+		for within account
+	
+**tools to apply permission guardrails
+	require that traffic stays within your vpc
+		vpc private link and endpoint policies
+		
+	permission guardrails to restrict access for principals across accounts
+		aws organizations service control policies(SCP)
+	
+	enable developers to create and manage permissions, while controlling the max permissions they grant
+		identity and access management permission boundaries
+		
+**scp and permission boundaries are for delegating administration
+	scp as permission guardrails
+		establish controls that all IAM principals(user and roles)adhere to
+			across an account, organization unit, organization
+		
+		**push restrictions common among accounts into scp
+		
+		example:
+			restrict access to specific aws regions
+			prevent your iam principals from deleting common resource
+			restrict services actions for all iam entities except a specific role
+			
+	
+	permission boundaries delegate administration to developers
+		set limitation on the privileges a developer can grant
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+					
+	
+	

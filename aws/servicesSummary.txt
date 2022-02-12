@@ -1,8 +1,44 @@
-This doc contains short description of some aws services, with short summary 
-about what they are and what they can do. 
+This doc contains short description of some aws services
 
 AWS Amplify 
 	. a set of tools and services that can be used together or on their own, 
 		to help front-end web and mobile developers build scalable full stack applications, powered by AWS.
 	. supports popular web frameworks including JavaScript, React, Angular, Vue, Next.js, 
 		and mobile platforms including Android, iOS, React Native, Ionic, Flutter.
+		
+Amazon Macie 
+	. is a fully managed data security and data privacy service 
+	. uses machine learning and pattern matching to help you discover, 
+		monitor, and protect sensitive data in your AWS environment.
+		
+VPC endpoint 
+	. enables you to privately connect your VPC to supported AWS services 
+	. powered by AWS PrivateLink 
+		without requiring an internet gateway, NAT device, VPN connection, or AWS Direct Connect connection.
+		
+AWS Trusted Advisor 
+	. provides best practice recommendations.
+	
+AWS Config 
+	. enables you to assess, audit, and evaluate the *configurations of your AWS resources
+	. automate the evaluation of recorded configurations against desired configurations
+	. simplify compliance auditing, security analysis, change management, and operational troubleshooting
+	. By creating an AWS Config rule, you can enforce your ideal configuration in your AWS account
+
+	
+web application firewall (WAF)
+	. monitor the HTTP and HTTPS requests that are forwarded to 
+		an Amazon API Gateway API
+		Amazon CloudFront 
+		an Application Load Balancer
+	. control access to your content
+		Allow all requests except the ones that you specify
+			useful to serve content for a public website, but you also want to block requests from attackers
+		Block all requests except the ones that you specify
+			useful to serve content for a restricted website whose users are readily identifiable by properties in web requests
+		Count the requests that match the properties that you specify
+			 count the requests that match those properties of interested without allowing or blocking those requests
+			
+Guard​Duty
+	. a threat detection service that continuously monitors for malicious activity 
+		and unauthorized behavior to protect your AWS accounts and workloads

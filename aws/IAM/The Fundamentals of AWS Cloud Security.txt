@@ -1,0 +1,22 @@
+The Fundamentals of aws Cloud Security
+--------------------------------------
+introduction to the aws-wide security features
+	control your cloud infrastructure: aws IAM
+	control your data: aws KMS
+	control your network: Amazon VPC
+
+	*learn the patterns knowing what to look for
+		the fill in the rest with details
+		
+aws IAM
+	what it is
+		I - authentication: support for human and application caller identities
+		AM - authorization: powerful, flexible permissions language for controlling access to cloud resources
+	
+	why it matters to you
+		every aws service uses IAM to authenticate and authorize API calls
+		
+	what builders need to know
+		how to make authenticated api calls to aws from IAM identities
+		basic fluency in IAM policy language
+		where to find and how to understand service-specific authorization control details
