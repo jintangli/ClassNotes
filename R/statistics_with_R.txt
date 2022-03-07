@@ -25,5 +25,115 @@ arithmetic operations in R
 	log base 3: log2(y)
 	exponential: exp(y)
 	absolute: abs(y)
+
+comments 
+	every thing after "#" is ignore
+	
+	
+---------------vectors and matrix---------------------------
+create vector using "c" 
+	x1 = c(1, 3, 5, 7, 9)
+	gender <- ("male", "female")
+	
+create vector of inclusive sequence using ":"
+	2:6
+
+create vector for more general sequence
+	seq(from=2, to=6, by=1)
+	
+create vector with repeated values
+	rep("A", times=10)
+	rep(1:3, times=5)
+	
+apply arithmetic operations to each element of vector
+	x = 1:5
+	x + 10
+	x*10
+	
+if two vectors are of the same length, we may add/subtract/multiply/divide corresponding elements
+	x = 1:5
+	y = 6:10
+	x + y
+
+retrieve element from vector using "[]", index started from 1
+	y[2]
+	
+retrieve all element except the 3rd element
+	y[-3]
+	
+retrieve a range of element, ex: the first 3
+	y[1:3]
+	
+retrieve a group of random index, ex: first and fifth
+	y[c(1, 5)]
+	
+retrieve all except a group of random index, ex: except the first and fifth
+	y[-c(1, 5)]
+	
+retrieve all the elements less than 6
+	y[y<6]
+	
+create matrix using "matrix"
+	one row at a time
+		x = matrix(c(1, 2, 3, 4, 5, 6, 7, 8, 9), nrow=3, byrow=TRUE)
+	one column at a time
+		y = matrix(1:9, nrow=3, byrow=FALSE)
+
+retrieve value from matrix, ex: first row, second column
+	x[1, 2]
+	
+retrieve multiple values from matrix, ex: first row and third row, second column
+	x[c(1, 3), 2]
+	
+retrieve entire row, ex: first row
+	x[1, ]
+
+---------------import data copy data from excel to R csv & txt ---------------------------
+import csv file
+	data1 <- read.csv(file.choose(), header=TRUE)
+	data2 <- read.table(file.choose(), header=TRUE, sep=",")
+	
+import tab delimited txt file
+	data3 <- read.delim(file.choose(), header=TRUE)
+	data4 <- read.table(file.choose, header=T, sep="\t")
+
+	
+---------------Importing/Reading Excel data into R using RStudio (readxl)  ---------------------------	
+readxl package can import both .xlsx and .xls files
+	file->Import DataSet -> From Excel
+	OR
+	Import Dataset -> from excel
+can enter file path or url
+"sheet" field for specify which tab in excel file
+"range" field for specify start cell to end cell ex. B3-E11
+"Max Rows" field for specify the max number of rows to be included
+"skip" field for specify the number of first rows to be skip
+"N/A" field for specify what cell values to be replace by N/A
+the code preview pane contains the code generated for our selected options
+
+---------------Export Data from R (csv , txt and other formats)  ---------------------------
+the most flexible command for exporting data from R is "write.table"
+	write.table(DataToExport, file="/filePath/../ExportedFileName.csv", sep=",", row.names=FALSE)
+		#DataToExport is variable containing data to be exported from RStudio
+		#file="/filePath/../ExportedFileName.csv" is the file name and location
+		#sep="," values will be separated by "," in file
+		#row.names=FALSE, ignore the row names/numbers in the file
+	write.csv(DataToExport, file="/filePath/../ExportedFileName.csv", row.names=FALSE)	
+
+---------------working with Data from R ---------------------------
+view the dimension of data
+	dim(data1)
+remove variable	
+	rm(variable)
+view the first 6 rows of data
+	head(data1)
+view the last 6 rows of data
+	tail(data1)
+viewing subset of data
+	data1[(5,6,7,8,9),]
+	data1[5:9, ]
+	data1[-(4, 422), ] #all rows except row 4 upto 422
+find all the column names of variable
+	names(data1)
 	
 	
