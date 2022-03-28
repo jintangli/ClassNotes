@@ -98,11 +98,11 @@ databinding
 	databinding = communication
 	communication between 
 		TypeScript Code(Business Logic)|-----------------output data--------------->|Template(HTML)
-									   |		string interpolation({{data}})      |
-									   | 		property binding([property]="data") |
-									   |<-------------react to user events----------|
-									   |		event Binding((event)="expression") |
-	                                   |        two-way-binding([(ngModel)]="data") |                                         |
+					       |	string interpolation({{data}})      |
+					       | 	property binding([property]="data") |
+					       |<-------------react to user events----------|
+					       |	event Binding((event)="expression") |
+	                                       |        two-way-binding([(ngModel)]="data") |                                         |
 		
 	string interpolation
 		for outputting data in template
