@@ -102,7 +102,7 @@ databinding
 					       | 	property binding([property]="data") |
 					       |<-------------react to user events----------|
 					       |	event Binding((event)="expression") |
-	                                       |        two-way-binding([(ngModel)]="data") |                                         |
+	                                       |        two-way-binding([(ngModel)]="data") |
 		
 	string interpolation
 		for outputting data in template
